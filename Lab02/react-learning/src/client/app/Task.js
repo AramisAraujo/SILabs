@@ -1,12 +1,13 @@
 var React = require('react');
+
 var Task = React.createClass({
 
 	getInitialState: function () {
 
-		return ({ color: "white" })
+		return ({ color: "white", title: "" })
 	},
 
-		changeColor: function() {
+	changeColor: function() {
 
 		{this.setState({color : "fuchsia"})};
 
@@ -17,10 +18,15 @@ var Task = React.createClass({
 		var bgColor = {backgroundColor: this.state.color};
 
 		return(
-			<button onClick={this.changeColor} style={bgColor}>
-				Whepa!
-			</button>);
-	}
+			<div>
+				<h1>
+					{this.state.title}
+				</h1>
+				<button onClick={this.changeColor} style={bgColor}>
+					Pinkify
+				</button>
+			</div>
+				);}
 
 
 });

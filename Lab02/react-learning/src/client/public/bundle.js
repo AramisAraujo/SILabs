@@ -51,8 +51,7 @@
 	
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 32);
-	var Task = __webpack_require__(/*! ./Task */ 178);
-	var TaskBox = __webpack_require__(/*! ./TaskBox */ 179);
+	var TaskBox = __webpack_require__(/*! ./TaskBox.js */ 179);
 	
 	ReactDOM.render(React.createElement(TaskBox, null), document.getElementById('app'));
 
@@ -22004,13 +22003,14 @@
 	"use strict";
 	
 	var React = __webpack_require__(/*! react */ 1);
+	
 	var Task = React.createClass({
 		displayName: "Task",
 	
 	
 		getInitialState: function getInitialState() {
 	
-			return { color: "white" };
+			return { color: "white", title: "" };
 		},
 	
 		changeColor: function changeColor() {
@@ -22025,9 +22025,18 @@
 			var bgColor = { backgroundColor: this.state.color };
 	
 			return React.createElement(
-				"button",
-				{ onClick: this.changeColor, style: bgColor },
-				"Whepa!"
+				"div",
+				null,
+				React.createElement(
+					"h1",
+					null,
+					this.state.title
+				),
+				React.createElement(
+					"button",
+					{ onClick: this.changeColor, style: bgColor },
+					"Pinkify"
+				)
 			);
 		}
 	
@@ -22042,12 +22051,55 @@
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	var React = __webpack_require__(/*! react */ 1);
+	var TaskList = __webpack_require__(/*! ./TaskList.js */ 180);
 	
 	var TaskBox = React.createClass({
-		displayName: "TaskBox",
+		displayName: 'TaskBox',
+	
+	
+		render: function render() {
+			var _this = this;
+	
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(TaskList, { ref: 'TaskList' }),
+				React.createElement(
+					'form',
+					{ onSubmit: function onSubmit() {
+							return _this.refs.TaskList.addTask;
+						} },
+					React.createElement('input', { type: 'text', name: 'taskName',
+						ref: function ref(task) {
+							return _this._inputElement = task;
+						} }),
+					React.createElement('p', null),
+					React.createElement('input', { type: 'submit', value: 'Add Task' }),
+					React.createElement('p', null)
+				)
+			);
+		}
+	});
+	
+	module.exports = TaskBox;
+
+/***/ },
+/* 180 */
+/*!************************************!*\
+  !*** ./src/client/app/TaskList.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(/*! react */ 1);
+	var Task = __webpack_require__(/*! ./Task.js */ 178);
+	
+	var TaskList = React.createClass({
+		displayName: 'TaskList',
 	
 	
 		getInitialState: function getInitialState() {
@@ -22068,48 +22120,29 @@
 	
 		addTask: function addTask(submitEvent) {
 	
-			var taskList = this.state.tasks;
-			var taskTitle = this._inputElement.value;
+			var newTask = new Task();
 	
-			if (this.isValidTitle(taskTitle)) {
-				//Check valid task title
-				taskList.push({
-					title: this._inputElement.value,
-					key: Date.now() });
-			}
+			newTask.setState({ title: this.props.taskName });
+	
+			var taskList = this.state.tasks;
+			//var taskTitle = this._inputElement.value;
+	
+			//if(this.isValidTitle(taskTitle)){//Check valid task title
+			taskList.push({
+				task: aTask,
+				key: Date.now() });
+			//}
 	
 			this.setState({
 				tasks: taskList //Updating state
 			});
 	
-			this._inputElement.value = ""; //Reset input value
+			//this._inputElement.value = ""; //Reset input value
 	
-			submitEvent.preventDefault(); //Overriding default submit event
+			//submitEvent.preventDefault(); //Overriding default submit event
 		},
 	
-		render: function render() {
-			var _this = this;
-	
-			return React.createElement(
-				"form",
-				{ onSubmit: this.addTask },
-				React.createElement("input", { type: "text", name: "taskName",
-					ref: function ref(task) {
-						return _this._inputElement = task;
-					} }),
-				React.createElement("p", null),
-				React.createElement("input", { type: "submit", value: "Add Task" }),
-				React.createElement("p", null),
-				React.createElement(TaskList, { entries: this.state.tasks })
-			);
-		}
-	});
-	
-	var TaskList = React.createClass({
-		displayName: "TaskList",
-	
-	
-		removeTask: function removeTask(task) {
+		removeTask: function removeTask(atask) {
 	
 			var taskList = this.state.tasks;
 	
@@ -22124,22 +22157,22 @@
 	
 		render: function render() {
 	
-			var taskListEntries = this.props.entries;
+			var taskListEntries = this.state.tasks;
 	
 			function createTasks(task) {
 	
 				return React.createElement(
-					"div",
+					'div',
 					null,
 					React.createElement(
-						"li",
+						'li',
 						{ key: task.key },
 						task.title
 					),
 					React.createElement(
-						"button",
+						'button',
 						{ onClick: this.removeTask(task) },
-						"X"
+						'Excluir'
 					)
 				);
 			}
@@ -22147,14 +22180,15 @@
 			var listedTasks = taskListEntries.map(createTasks);
 	
 			return React.createElement(
-				"ul",
-				{ className: "theTaskList" },
+				'ul',
+				{ className: 'theTaskList' },
 				listedTasks
 			);
 		}
+	
 	});
 	
-	module.exports = TaskBox;
+	module.exports = TaskList;
 
 /***/ }
 /******/ ]);
