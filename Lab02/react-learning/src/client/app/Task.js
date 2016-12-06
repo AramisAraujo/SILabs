@@ -4,12 +4,21 @@ var Task = React.createClass({
 
 	getInitialState: function () {
 
-		return ({ color: "white", title: "" })
+		return ({ color: "white", title: this.props.title, taskID: this.props.ID })
 	},
 
-	changeColor: function() {
+	removeTask: function(submitEvent) {
 
-		{this.setState({color : "fuchsia"})};
+		submitEvent.preventDefault();//Override default submit event
+		this.props.removeTask(this.props.taskID);
+		return;
+	},
+
+	toggleComplete: function (toggleEvent) {
+
+		toggleEvent.preventDefault();//Override default toggle event
+		this.props.toggleComplete(this.props.taskID);
+		return;		
 
 	},
 
@@ -20,11 +29,14 @@ var Task = React.createClass({
 		return(
 			<div>
 				<h1>
-					{this.state.title}
+					{this.props.title}
 				</h1>
-				<button onClick={this.changeColor} style={bgColor}>
-					Pinkify
-				</button>
+
+				<button type="button" className="btn btn-xs btn-success img-circle"
+				 onClick={this.toggleComplete}>&#x2713;</button>
+
+				<button type="button" className="btn btn-xs btn-danger img-circle"
+				 onClick={this.removeTask}>&#xff38;</button>
 			</div>
 				);}
 

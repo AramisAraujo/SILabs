@@ -51,7 +51,7 @@
 	
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 32);
-	var TaskBox = __webpack_require__(/*! ./TaskBox.js */ 179);
+	var TaskBox = __webpack_require__(/*! ./TaskBox.js */ 178);
 	
 	ReactDOM.render(React.createElement(TaskBox, null), document.getElementById('app'));
 
@@ -21995,6 +21995,180 @@
 
 /***/ },
 /* 178 */
+/*!***********************************!*\
+  !*** ./src/client/app/TaskBox.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(/*! react */ 1);
+	var TaskList = __webpack_require__(/*! ./TaskList.js */ 179);
+	
+	var TaskBox = React.createClass({
+		displayName: 'TaskBox',
+	
+	
+		getInitialState: function getInitialState() {
+			return {
+				data: [{ "id": "00001", "title": "First Task", "completed": "false" }, { "id": "00002", "title": "Second Task", "completed": "false" }, { "id": "00003", "title": "Third Task", "completed": "false" }]
+			};
+		},
+	
+		generateID: function generateID() {
+	
+			return Date.now().toString();
+		},
+	
+		handleTaskRemoval: function handleTaskRemoval(taskID) {
+	
+			var data = this.state.data;
+	
+			data = data.filter(function (element) {
+				return element.id !== taskID;
+			});
+	
+			this.setState({ data: data });
+	
+			return;
+		},
+	
+		handleTaskSubmit: function handleTaskSubmit(title) {
+	
+			var data = this.state.data;
+			var id = this.generateID();
+			var completed = "false";
+	
+			data = data.concat([{ id: id, title: title, completed: completed }]);
+	
+			this.setState({ data: data });
+		},
+	
+		handleToggleCompleted: function handleToggleCompleted(taskID) {
+			var data = this.state.data;
+	
+			for (var elementIndex in data) {
+	
+				if (data[elementIndex].id == taskID) {
+					data[elementIndex].completed = data[elementIndex].completed === "true" ? "false" : "true";
+	
+					break;
+				}
+			}
+	
+			this.setState({ data: data });
+			return;
+		},
+	
+		render: function render() {
+	
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'h1',
+					null,
+					'Todo List:'
+				),
+				React.createElement(TaskList, { data: this.state.data, removeTask: this.handleTaskRemoval,
+					toggleComplete: this.handleToggleCompleted }),
+				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
+			);
+		}
+	});
+	
+	var TaskSubmitter = React.createClass({
+		displayName: 'TaskSubmitter',
+	
+	
+		doSubmit: function doSubmit(submitEvent) {
+	
+			submitEvent.preventDefault(); //Override default submit event
+	
+			var taskTitle = this.refs.task.value.trim();
+	
+			if (!task) {
+				return;
+			}
+	
+			this.props.onTaskSubmit(taskTitle);
+	
+			this.refs.task.value = "";
+	
+			return;
+		},
+	
+		render: function render() {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.doSubmit },
+					React.createElement(
+						'label',
+						{ htmlFor: 'task' },
+						'Task'
+					),
+					React.createElement('input', { type: 'text', id: 'task', ref: 'task', placeholder: 'Diga-me, o que precisa fazer?' }),
+					React.createElement('input', { type: 'submit', value: 'Save Task' })
+				)
+			);
+		}
+	
+	});
+	
+	module.exports = TaskBox;
+
+/***/ },
+/* 179 */
+/*!************************************!*\
+  !*** ./src/client/app/TaskList.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(/*! react */ 1);
+	var Task = __webpack_require__(/*! ./Task.js */ 180);
+	
+	var TaskList = React.createClass({
+		displayName: 'TaskList',
+	
+	
+		toggleComplete: function toggleComplete(taskID) {
+			this.props.toggleComplete(taskID);
+			return;
+		},
+	
+		removeTask: function removeTask(taskID) {
+	
+			this.props.removeTask(taskID);
+			return;
+		},
+	
+		render: function render() {
+	
+			var listTasks = this.props.data.map(function (taskItem) {
+	
+				return React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
+					completed: taskItem.isComplete, removeTask: this.removeTask,
+					toggleComplete: this.toggleComplete });
+			}, this);
+	
+			return React.createElement(
+				'ul',
+				{ className: 'list-group' },
+				listTasks
+			);
+		}
+	
+	});
+	
+	module.exports = TaskList;
+
+/***/ },
+/* 180 */
 /*!********************************!*\
   !*** ./src/client/app/Task.js ***!
   \********************************/
@@ -22010,14 +22184,21 @@
 	
 		getInitialState: function getInitialState() {
 	
-			return { color: "white", title: "" };
+			return { color: "white", title: this.props.title, taskID: this.props.ID };
 		},
 	
-		changeColor: function changeColor() {
+		removeTask: function removeTask(submitEvent) {
 	
-			{
-				this.setState({ color: "fuchsia" });
-			};
+			submitEvent.preventDefault(); //Override default submit event
+			this.props.removeTask(this.props.taskID);
+			return;
+		},
+	
+		toggleComplete: function toggleComplete(toggleEvent) {
+	
+			toggleEvent.preventDefault(); //Override default toggle event
+			this.props.toggleComplete(this.props.taskID);
+			return;
 		},
 	
 		render: function render() {
@@ -22030,12 +22211,19 @@
 				React.createElement(
 					"h1",
 					null,
-					this.state.title
+					this.props.title
 				),
 				React.createElement(
 					"button",
-					{ onClick: this.changeColor, style: bgColor },
-					"Pinkify"
+					{ type: "button", className: "btn btn-xs btn-success img-circle",
+						onClick: this.toggleComplete },
+					"\u2713"
+				),
+				React.createElement(
+					"button",
+					{ type: "button", className: "btn btn-xs btn-danger img-circle",
+						onClick: this.removeTask },
+					"\uFF38"
 				)
 			);
 		}
@@ -22043,152 +22231,6 @@
 	});
 	
 	module.exports = Task;
-
-/***/ },
-/* 179 */
-/*!***********************************!*\
-  !*** ./src/client/app/TaskBox.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(/*! react */ 1);
-	var TaskList = __webpack_require__(/*! ./TaskList.js */ 180);
-	
-	var TaskBox = React.createClass({
-		displayName: 'TaskBox',
-	
-	
-		render: function render() {
-			var _this = this;
-	
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(TaskList, { ref: 'TaskList' }),
-				React.createElement(
-					'form',
-					{ onSubmit: function onSubmit() {
-							return _this.refs.TaskList.addTask;
-						} },
-					React.createElement('input', { type: 'text', name: 'taskName',
-						ref: function ref(task) {
-							return _this._inputElement = task;
-						} }),
-					React.createElement('p', null),
-					React.createElement('input', { type: 'submit', value: 'Add Task' }),
-					React.createElement('p', null)
-				)
-			);
-		}
-	});
-	
-	module.exports = TaskBox;
-
-/***/ },
-/* 180 */
-/*!************************************!*\
-  !*** ./src/client/app/TaskList.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(/*! react */ 1);
-	var Task = __webpack_require__(/*! ./Task.js */ 178);
-	
-	var TaskList = React.createClass({
-		displayName: 'TaskList',
-	
-	
-		getInitialState: function getInitialState() {
-	
-			return {
-				tasks: []
-			};
-		},
-	
-		isValidTitle: function isValidTitle(title) {
-	
-			if (title == "") {
-				return false;
-			}
-	
-			return true;
-		},
-	
-		addTask: function addTask(submitEvent) {
-	
-			var newTask = new Task();
-	
-			newTask.setState({ title: this.props.taskName });
-	
-			var taskList = this.state.tasks;
-			//var taskTitle = this._inputElement.value;
-	
-			//if(this.isValidTitle(taskTitle)){//Check valid task title
-			taskList.push({
-				task: aTask,
-				key: Date.now() });
-			//}
-	
-			this.setState({
-				tasks: taskList //Updating state
-			});
-	
-			//this._inputElement.value = ""; //Reset input value
-	
-			//submitEvent.preventDefault(); //Overriding default submit event
-		},
-	
-		removeTask: function removeTask(atask) {
-	
-			var taskList = this.state.tasks;
-	
-			var taskIndex = taskList.indexOf(task);
-	
-			taskList.splice(taskIndex, 1);
-	
-			this.setState({
-				tasks: taskList
-			});
-		},
-	
-		render: function render() {
-	
-			var taskListEntries = this.state.tasks;
-	
-			function createTasks(task) {
-	
-				return React.createElement(
-					'div',
-					null,
-					React.createElement(
-						'li',
-						{ key: task.key },
-						task.title
-					),
-					React.createElement(
-						'button',
-						{ onClick: this.removeTask(task) },
-						'Excluir'
-					)
-				);
-			}
-	
-			var listedTasks = taskListEntries.map(createTasks);
-	
-			return React.createElement(
-				'ul',
-				{ className: 'theTaskList' },
-				listedTasks
-			);
-		}
-	
-	});
-	
-	module.exports = TaskList;
 
 /***/ }
 /******/ ]);
