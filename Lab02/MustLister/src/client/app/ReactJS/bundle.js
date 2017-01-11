@@ -22048,57 +22048,40 @@
 			this.setState({ data: data });
 		},
 	
-		handleToggleCompleted: function handleToggleCompleted(taskID) {
-			var data = this.state.data;
-	
-			for (var elementIndex in data) {
-	
-				if (data[elementIndex].id == taskID) {
-					data[elementIndex].completed = data[elementIndex].completed === "true" ? "false" : "true";
-	
-					break;
-				}
-			}
-	
-			this.setState({ data: data });
-			return;
-		},
-	
-		handleColorChange: function handleColorChange(newColor) {
-	
-			this.setState({ color: newColor.hex });
-			return;
-		},
-	
-		handleFontChange: function handleFontChange(newFont) {
-	
-			this.setState({ font: newFont });
-			return;
-		},
-	
 		render: function render() {
 	
 			var listStyle = { color: this.state.color, fontFamily: this.state.font };
 	
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'pure-g' },
 				React.createElement(
-					'h1',
-					{ className: 'vert-offset-top-0' },
-					'My To do List:'
+					'div',
+					{ className: 'pure-u-1-3' },
+					React.createElement(
+						'h1',
+						null,
+						'My To do List:'
+					),
+					React.createElement(
+						'h1',
+						null,
+						'Todo List:'
+					),
+					React.createElement(TaskList, { data: this.state.data, removeTask: this.handleTaskRemoval,
+						toggleComplete: this.handleToggleCompleted, font: this.state.font,
+						color: this.state.color, style: listStyle }),
+					React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
 				),
-				React.createElement(Menu, { fontChanger: this.handleFontChange, colorChanger: this.handleColorChange,
-					color: this.state.color }),
 				React.createElement(
-					'h1',
-					null,
-					'Todo List:'
-				),
-				React.createElement(TaskList, { data: this.state.data, removeTask: this.handleTaskRemoval,
-					toggleComplete: this.handleToggleCompleted, font: this.state.font,
-					color: this.state.color, style: listStyle }),
-				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
+					'div',
+					{ className: 'pure-g' },
+					React.createElement(
+						'h1',
+						null,
+						'Oie'
+					)
+				)
 			);
 		}
 	});
@@ -22127,35 +22110,34 @@
 		render: function render() {
 			return React.createElement(
 				'div',
-				{ className: 'commentForm vert-offset-top-2' },
-				React.createElement('hr', null),
+				null,
 				React.createElement(
 					'div',
-					{ className: 'clearfix' },
+					null,
 					React.createElement(
 						'form',
 						{ onSubmit: this.doSubmit },
 						React.createElement(
 							'div',
-							{ className: 'form-group' },
+							null,
 							React.createElement(
 								'label',
-								{ htmlFor: 'task', className: 'col-md-2 control-label' },
+								{ htmlFor: 'task' },
 								'Tell me what you must:'
 							),
 							React.createElement(
 								'div',
-								{ className: 'col-md-10' },
+								null,
 								React.createElement('input', { type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
 							)
 						),
 						React.createElement(
 							'div',
-							{ className: 'row' },
+							null,
 							React.createElement(
 								'div',
-								{ className: 'col-md-10 col-md-offset-2 text-right' },
-								React.createElement('input', { type: 'submit', value: 'Save Task', className: 'btn btn-primary' })
+								null,
+								React.createElement('input', { type: 'submit', value: 'Save Task' })
 							)
 						)
 					)
@@ -22200,13 +22182,13 @@
 	
 				return React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
 					completed: taskItem.isComplete, removeTask: this.removeTask,
-					toggleComplete: this.toggleComplete, font: this.props.font,
-					color: this.props.color });
+					font: this.props.font
+				});
 			}, this);
 	
 			return React.createElement(
 				'ul',
-				{ className: 'list-group' },
+				{ className: 'list-group', onClick: this.handleClick },
 				listTasks
 			);
 		}
@@ -22222,18 +22204,21 @@
   \****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+	
+	var _reactColor = __webpack_require__(/*! react-color */ 182);
 	
 	var React = __webpack_require__(/*! react */ 1);
+	var FontPicker = __webpack_require__(/*! react-font-picker */ 420);
 	
 	var Task = React.createClass({
-		displayName: "Task",
+		displayName: 'Task',
 	
 	
 		getInitialState: function getInitialState() {
 	
-			return { color: this.props.color, title: this.props.title,
-				font: this.props.font, taskID: this.props.ID };
+			return { color: "black", title: this.props.title,
+				font: "Courier New", taskID: this.props.ID, completed: false };
 		},
 	
 		removeTask: function removeTask(submitEvent) {
@@ -22246,44 +22231,68 @@
 		toggleComplete: function toggleComplete(toggleEvent) {
 	
 			toggleEvent.preventDefault(); //Override default toggle event
-			this.props.toggleComplete(this.props.taskID);
+	
+			var completed = this.state.completed === true ? false : true;
+	
+			this.setState({ completed: completed });
+	
 			return;
 		},
 	
-		componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-			if (nextProps != this.props) {
-				this.setState(nextProps);
-			}
+		changeColor: function changeColor(newColor) {
+	
+			this.setState({ color: newColor.hex });
+			return;
+		},
+	
+		changeFont: function changeFont(newFont) {
+	
+			this.setState({ font: newFont });
+			return;
 		},
 	
 		render: function render() {
 	
-			var style = { color: this.state.color, fontFamily: this.state.font };
+			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "white" };
 	
 			if (this.state.completed == true) {
 	
-				buttonColor = { backgroundColor: "red" };
+				var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
 			}
 	
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"h1",
+					'h1',
 					{ style: style },
 					this.props.title
 				),
 				React.createElement(
-					"button",
-					{ type: "button", style: { backgroundColor: "limegreen" }, className: "btn btn-xs btn-success img-circle",
-						onClick: this.toggleComplete },
-					"\u2713"
+					'h1',
+					null,
+					'Pick a Color!',
+					React.createElement(_reactColor.CirclePicker, { color: this.state.color,
+						onChangeComplete: this.changeColor })
 				),
 				React.createElement(
-					"button",
-					{ type: "button", style: { backgroundColor: "crimson" }, className: "btn btn-xs btn-danger img-circle",
+					'h1',
+					null,
+					'Pick a cool Font!',
+					React.createElement(FontPicker, { label: this.state.font, previews: true,
+						activeColor: '#64B5F6', onChange: this.changeFont })
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "limegreen" }, className: 'pure-button pure-button-active',
+						onClick: this.toggleComplete },
+					'\u2713'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "crimson" }, className: 'pure-button pure-button-active',
 						onClick: this.removeTask },
-					"\uFF38"
+					'\uFF38'
 				)
 			);
 		}
@@ -22301,8 +22310,6 @@
 
 	'use strict';
 	
-	var _reactColor = __webpack_require__(/*! react-color */ 182);
-	
 	var React = __webpack_require__(/*! react */ 1);
 	var FontPicker = __webpack_require__(/*! react-font-picker */ 420);
 	
@@ -22314,13 +22321,6 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h1',
-					null,
-					'Pick a Color!',
-					React.createElement(_reactColor.CirclePicker, { color: this.props.color,
-						onChangeComplete: this.props.colorChanger })
-				),
 				React.createElement(
 					'h1',
 					null,

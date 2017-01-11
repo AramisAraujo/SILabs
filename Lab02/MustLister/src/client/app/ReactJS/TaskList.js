@@ -13,7 +13,7 @@ var TaskList = React.createClass({
 		this.props.removeTask(taskID);
 		return;
 
-	},	
+	},
 
 	render: function () {
 
@@ -22,14 +22,14 @@ var TaskList = React.createClass({
 			return(
 				<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
 				completed={taskItem.isComplete} removeTask={this.removeTask}
-				toggleComplete={this.toggleComplete} font={this.props.font} 
-				color={this.props.color}/>
+				font={this.props.font} 
+				/>
 
 			);
 		}, this);
 
 		return(
-			<ul className="list-group">
+			<ul className="list-group" onClick={this.handleClick}>
 				{listTasks}
 			</ul>
 

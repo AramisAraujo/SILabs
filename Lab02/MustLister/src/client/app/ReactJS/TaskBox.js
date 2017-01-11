@@ -49,34 +49,6 @@ var TaskBox = React.createClass({
 
 	},
 
-	handleToggleCompleted: function (taskID) {
-		var data = this.state.data;
-
-		for (var elementIndex in data) {
-
-			if(data[elementIndex].id == taskID){
-				data[elementIndex].completed = data[elementIndex].completed === 
-				"true" ? "false" : "true";
-
-				break;
-			}
-		}
-
-		this.setState({data});
-		return;
-	},
-
-	handleColorChange: function(newColor) {
-
-		this.setState({color: newColor.hex});
-		return;
-	},
-
-	handleFontChange: function(newFont) {
-
-		this.setState({font: newFont});
-		return;
-	},
 
 	render: function () {
 
@@ -84,19 +56,22 @@ var TaskBox = React.createClass({
 
 		return(
 		
-		<div>
-			<h1 className="vert-offset-top-0">My To do List:</h1>
-			<Menu fontChanger={this.handleFontChange} colorChanger={this.handleColorChange}
-			 color={this.state.color}/>
+		<div className="pure-g">
+			<div className="pure-u-1-3">
+				<h1>My To do List:</h1>
 
-			<h1>Todo List:</h1>
+				<h1>Todo List:</h1>
 
-			<TaskList data={this.state.data} removeTask ={this.handleTaskRemoval}
-			toggleComplete={this.handleToggleCompleted} font={this.state.font}
-			color={this.state.color} style={listStyle}/>
+				<TaskList data={this.state.data} removeTask ={this.handleTaskRemoval}
+				toggleComplete={this.handleToggleCompleted} font={this.state.font}
+				color={this.state.color} style={listStyle}/>
 
-			<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
+				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
+			</div>
+			<div className="pure-g">
 
+				<h1>Oie</h1>
+			</div>
 		</div>
 			);
 	}
@@ -124,19 +99,18 @@ var TaskSubmitter = React.createClass({
 
 	render: function() {
 		return (
-			<div className="commentForm vert-offset-top-2">
-				<hr />
-					<div className="clearfix">				
+			<div>
+				<div>				
 					<form onSubmit={this.doSubmit}>
-						<div className="form-group">
-							<label htmlFor="task" className="col-md-2 control-label">Tell me what you must:</label>
-							<div className="col-md-10">
+						<div>
+							<label htmlFor="task">Tell me what you must:</label>
+							<div>
 								<input type="text" id="task" ref="task" placeholder="I have to..." />
 							</div>
 						</div>
-						<div className="row">
-							<div className="col-md-10 col-md-offset-2 text-right">
-								<input type="submit" value="Save Task" className="btn btn-primary" />
+						<div>
+							<div>
+								<input type="submit" value="Save Task"/>
 							</div>
 						</div>
 					</form>
