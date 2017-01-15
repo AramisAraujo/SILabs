@@ -54,7 +54,7 @@ var Task = React.createClass({
 		}
 
 		return(
-			<li>
+			<div className="myBox">
 
 				<h1 style={style}>
 					{this.props.title}
@@ -68,7 +68,7 @@ var Task = React.createClass({
 
 				<h1>
 					Pick a cool Font!
-					<FontPicker label={this.state.font}  previews={true}
+					<FontPicker label={this.state.font}  previews={false}
         			activeColor="#64B5F6" onChange={this.changeFont}/>
         		</h1>
 
@@ -77,7 +77,7 @@ var Task = React.createClass({
 
 				<button type="button" style={{backgroundColor: "crimson"}} className="pure-button pure-button-active"
 				 onClick={this.removeTask}>&#xff38;</button>
-			</li>
+			</div>
 				);}
 
 
