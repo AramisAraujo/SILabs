@@ -22041,6 +22041,7 @@
 	
 	var React = __webpack_require__(/*! react */ 1);
 	var Task = __webpack_require__(/*! ./Task.js */ 180);
+	var CompletionBar = __webpack_require__(/*! ./CompleteBar.js */ 420);
 	
 	var TaskList = React.createClass({
 		displayName: 'TaskList',
@@ -22048,9 +22049,10 @@
 	
 		getInitialState: function getInitialState() {
 			return {
-				data: [{ "id": "00001", "title": "Study some more", "completed": "false" }, { "id": "00002", "title": "Make some neat CSS", "completed": "false" }, { "id": "00003", "title": "Have some fun", "completed": "false" }],
+				data: [{ "id": "00001", "title": "Study some more", "completed": false }, { "id": "00002", "title": "Make some neat CSS", "completed": false }, { "id": "00003", "title": "Have some fun", "completed": false }],
 				color: "black",
-				font: "Arial"
+				font: "Arial",
+				completion: 0
 			};
 		},
 	
@@ -22063,7 +22065,7 @@
 	
 			var data = this.state.data;
 			var id = this.generateID();
-			var completed = "false";
+			var completed = false;
 	
 			data = data.concat([{ id: id, title: title, completed: completed }]);
 	
@@ -22088,13 +22090,37 @@
 			return Date.now().toString();
 		},
 	
+		handleTaskCompletion: function handleTaskCompletion() {
+	
+			var completedTasks = 0.0;
+			var taskCount = 0.0;
+	
+			this.state.data.map(function (taskItem) {
+	
+				if (taskItem.completed == true) {
+					completedTasks += 1;
+					window.alert("cheguei!");
+				}
+				taskCount += 1;
+				window.alert("whepa");
+				window.alert("completed: " + completedTasks);
+				return;
+			}, this);
+	
+			var completionRate = completedTasks / taskCount;
+	
+			this.setState({ completion: completionRate });
+	
+			return;
+		},
+	
 		render: function render() {
 	
 			var listTasks = this.state.data.map(function (taskItem) {
 	
 				return React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
-					completed: taskItem.isComplete, removeTask: this.handleTaskRemoval,
-					font: this.props.font
+					completed: taskItem.completed, removeTask: this.handleTaskRemoval,
+					font: this.props.font, updateCompletion: this.handleTaskCompletion.bind(this)
 				});
 			}, this);
 	
@@ -22106,6 +22132,7 @@
 					null,
 					'This is a task list:'
 				),
+				React.createElement(CompletionBar, { completionRate: this.state.completion }),
 				listTasks,
 				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
 			);
@@ -22123,7 +22150,7 @@
 	
 			var taskTitle = this.refs.task.value.trim();
 	
-			if (task == "") {
+			if (taskTitle == "") {
 	
 				return;
 			}
@@ -22212,6 +22239,8 @@
 	
 			this.setState({ completed: completed });
 	
+			this.props.updateCompletion();
+	
 			return;
 		},
 	
@@ -22229,7 +22258,7 @@
 	
 		render: function render() {
 	
-			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "white" };
+			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
 	
 			if (this.state.completed == true) {
 	
@@ -36124,6 +36153,34 @@
 	exports["default"] = FontPicker;
 	module.exports = exports["default"];
 	/* Wrapper */ /* Floating label text */ /* Selected option */ /* Downdown button */ /* Options list */
+
+/***/ },
+/* 420 */
+/*!***********************************************!*\
+  !*** ./src/client/app/ReactJS/CompleteBar.js ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(/*! react */ 1);
+	
+	var CompletionBar = React.createClass({
+		displayName: 'CompletionBar',
+	
+	
+		render: function render() {
+			return React.createElement(
+				'div',
+				null,
+				'|',
+				this.props.completionRate,
+				'|'
+			);
+		}
+	});
+	
+	module.exports = CompletionBar;
 
 /***/ }
 /******/ ]);

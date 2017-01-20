@@ -27,6 +27,8 @@ var Task = React.createClass({
 
 		this.setState({completed: completed});
 		
+		this.props.updateCompletion();
+
 		return;		
 
 	},
@@ -45,7 +47,7 @@ var Task = React.createClass({
 
 	render: function () {
 
-		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "white"};
+		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "transparent"};
 
 		if(this.state.completed == true){
 

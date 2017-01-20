@@ -1,17 +1,19 @@
 var React = require('react');
 var Task = require('./Task.js');
+var CompletionBar = require('./CompleteBar.js');
 
 var TaskList = React.createClass({
 
 	getInitialState: function () {
 		return{
 			data: [
-				{"id":"00001","title":"Study some more","completed":"false"},
-				{"id":"00002","title":"Make some neat CSS","completed":"false"},
-				{"id":"00003","title":"Have some fun","completed":"false"}
+				{"id":"00001","title":"Study some more","completed":false},
+				{"id":"00002","title":"Make some neat CSS","completed":false},
+				{"id":"00003","title":"Have some fun","completed":false}
 			],
 			color: "black",
-			font: "Arial"
+			font: "Arial",
+			completion: 0
 		};
 	},
 
@@ -24,7 +26,7 @@ var TaskList = React.createClass({
 
 		var data = this.state.data;
 		var id = this.generateID();
-		var completed = "false";
+		var completed = false;
 
 		data = data.concat([{id,title,completed}]);
 
@@ -51,14 +53,38 @@ var TaskList = React.createClass({
 		return Date.now().toString();
 	},
 
+	handleTaskCompletion: function() {
+
+		var completedTasks = 0.0;
+		var taskCount = 0.0;
+
+		this.state.data.map(function (taskItem){
+
+			if(taskItem.completed == true){
+				completedTasks += 1;
+				window.alert("cheguei!");
+			}
+			taskCount += 1;
+			window.alert("whepa");
+			window.alert("completed: "+ completedTasks);
+			return;
+		}, this);
+
+		var completionRate =  completedTasks / taskCount;
+
+		this.setState({completion: completionRate});
+
+		return;
+	},
+
 	render: function () {
 
 		var listTasks = this.state.data.map(function (taskItem){
 
 			return(
 				<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
-				completed={taskItem.isComplete} removeTask={this.handleTaskRemoval}
-				font={this.props.font} 
+				completed={taskItem.completed} removeTask={this.handleTaskRemoval}
+				font={this.props.font} updateCompletion = {this.handleTaskCompletion.bind(this)}
 				/>
 
 			);
@@ -67,6 +93,7 @@ var TaskList = React.createClass({
 		return(
 			<ul className="myBox" onClick={this.handleClick}>
 				<h1>This is a task list:</h1>
+				<CompletionBar completionRate={this.state.completion}/>
 				{listTasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 			</ul>
@@ -86,7 +113,7 @@ var TaskSubmitter = React.createClass({
 
 		var taskTitle = this.refs.task.value.trim();
 
-		if(task == ""){
+		if(taskTitle == ""){
 
 			return;
 		}
