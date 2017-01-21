@@ -22056,11 +22056,6 @@
 			};
 		},
 	
-		toggleComplete: function toggleComplete(taskID) {
-			this.props.toggleComplete(taskID);
-			return;
-		},
-	
 		handleTaskSubmit: function handleTaskSubmit(title) {
 	
 			var data = this.state.data;
@@ -22070,6 +22065,8 @@
 			data = data.concat([{ id: id, title: title, completed: completed }]);
 	
 			this.setState({ data: data });
+	
+			this.updateCompletion();
 		},
 	
 		handleTaskRemoval: function handleTaskRemoval(taskID) {
@@ -22082,7 +22079,7 @@
 	
 			this.setState({ data: data });
 	
-			return;
+			this.updateCompletion();
 		},
 	
 		generateID: function generateID() {
@@ -22090,28 +22087,36 @@
 			return Date.now().toString();
 		},
 	
-		handleTaskCompletion: function handleTaskCompletion() {
+		updateCompletion: function updateCompletion() {
 	
 			var completedTasks = 0.0;
 			var taskCount = 0.0;
 	
 			this.state.data.map(function (taskItem) {
 	
-				if (taskItem.completed == true) {
+				if (taskItem.completed) {
+	
 					completedTasks += 1;
-					window.alert("cheguei!");
 				}
 				taskCount += 1;
-				window.alert("whepa");
-				window.alert("completed: " + completedTasks);
-				return;
 			}, this);
 	
-			var completionRate = completedTasks / taskCount;
+			var completionRate = completedTasks / taskCount * 100;
 	
 			this.setState({ completion: completionRate });
+		},
 	
-			return;
+		handleTaskCompletion: function handleTaskCompletion(taskID, taskCompletion) {
+	
+			this.state.data.map(function (taskItem) {
+	
+				if (taskItem.id == taskID) {
+	
+					taskItem.completed = taskCompletion;
+				}
+			}, this);
+	
+			this.updateCompletion();
 		},
 	
 		render: function render() {
@@ -22120,7 +22125,7 @@
 	
 				return React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
 					completed: taskItem.completed, removeTask: this.handleTaskRemoval,
-					font: this.props.font, updateCompletion: this.handleTaskCompletion.bind(this)
+					font: this.props.font, updateCompletion: this.handleTaskCompletion
 				});
 			}, this);
 	
@@ -22132,7 +22137,13 @@
 					null,
 					'This is a task list:'
 				),
-				React.createElement(CompletionBar, { completionRate: this.state.completion }),
+				React.createElement(
+					'h1',
+					null,
+					'Completion rate: ',
+					this.state.completion,
+					' %'
+				),
 				listTasks,
 				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
 			);
@@ -22221,13 +22232,13 @@
 		getInitialState: function getInitialState() {
 	
 			return { color: "black", title: this.props.title,
-				font: "Courier New", taskID: this.props.ID, completed: false };
+				font: "Courier New", id: this.props.taskID, completed: false };
 		},
 	
 		removeTask: function removeTask(submitEvent) {
 	
 			submitEvent.preventDefault(); //Override default submit event
-			this.props.removeTask(this.props.taskID);
+			this.props.removeTask(this.state.id);
 			return;
 		},
 	
@@ -22239,7 +22250,7 @@
 	
 			this.setState({ completed: completed });
 	
-			this.props.updateCompletion();
+			this.props.updateCompletion(this.state.id, completed);
 	
 			return;
 		},

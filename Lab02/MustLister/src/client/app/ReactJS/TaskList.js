@@ -17,10 +17,6 @@ var TaskList = React.createClass({
 		};
 	},
 
-	toggleComplete: function (taskID) {
-		this.props.toggleComplete(taskID);
-		return;
-	},
 
 	handleTaskSubmit: function (title) {
 
@@ -31,6 +27,8 @@ var TaskList = React.createClass({
 		data = data.concat([{id,title,completed}]);
 
 		this.setState({data});
+
+		this.updateCompletion();
 
 	},
 
@@ -44,7 +42,7 @@ var TaskList = React.createClass({
 
 		this.setState({data});
 
-		return;
+		this.updateCompletion();
 
 	},
 
@@ -53,28 +51,39 @@ var TaskList = React.createClass({
 		return Date.now().toString();
 	},
 
-	handleTaskCompletion: function() {
+	updateCompletion: function(){
 
 		var completedTasks = 0.0;
 		var taskCount = 0.0;
 
-		this.state.data.map(function (taskItem){
+		this.state.data.map(function (taskItem) {
 
-			if(taskItem.completed == true){
+			if(taskItem.completed){
+
 				completedTasks += 1;
-				window.alert("cheguei!");
 			}
 			taskCount += 1;
-			window.alert("whepa");
-			window.alert("completed: "+ completedTasks);
-			return;
 		}, this);
 
-		var completionRate =  completedTasks / taskCount;
+		var completionRate =  (completedTasks / taskCount) * 100;
 
 		this.setState({completion: completionRate});
 
-		return;
+	},
+
+	handleTaskCompletion: function(taskID, taskCompletion) {
+
+		this.state.data.map(function (taskItem) {
+
+			if(taskItem.id == taskID){
+
+				taskItem.completed = taskCompletion;
+			}
+
+		}, this);
+
+		this.updateCompletion();
+
 	},
 
 	render: function () {
@@ -84,7 +93,7 @@ var TaskList = React.createClass({
 			return(
 				<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
 				completed={taskItem.completed} removeTask={this.handleTaskRemoval}
-				font={this.props.font} updateCompletion = {this.handleTaskCompletion.bind(this)}
+				font={this.props.font} updateCompletion = {this.handleTaskCompletion}
 				/>
 
 			);
@@ -93,7 +102,7 @@ var TaskList = React.createClass({
 		return(
 			<ul className="myBox" onClick={this.handleClick}>
 				<h1>This is a task list:</h1>
-				<CompletionBar completionRate={this.state.completion}/>
+				<h1>Completion rate: {this.state.completion} %</h1>
 				{listTasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 			</ul>

@@ -8,13 +8,13 @@ var Task = React.createClass({
 	getInitialState: function () {
 
 		return ({color: "black", title: this.props.title,
-		font: "Courier New", taskID: this.props.ID, completed: false })
+		font: "Courier New", id: this.props.taskID, completed: false })
 	},
 
 	removeTask: function(submitEvent) {
 
 		submitEvent.preventDefault();//Override default submit event
-		this.props.removeTask(this.props.taskID);
+		this.props.removeTask(this.state.id);
 		return;
 	},
 
@@ -27,7 +27,7 @@ var Task = React.createClass({
 
 		this.setState({completed: completed});
 		
-		this.props.updateCompletion();
+		this.props.updateCompletion(this.state.id, completed);
 
 		return;		
 
