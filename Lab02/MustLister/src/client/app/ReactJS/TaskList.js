@@ -1,6 +1,5 @@
 var React = require('react');
 var Task = require('./Task.js');
-var CompletionBar = require('./CompleteBar.js');
 
 var TaskList = React.createClass({
 
@@ -28,21 +27,21 @@ var TaskList = React.createClass({
 
 		this.setState({data});
 
-		this.updateCompletion();
+		this.updateCompletion(data);
 
 	},
 
 	handleTaskRemoval: function(taskID) {
 
-		var data = this.state.data;
+		var taskData = this.state.data;
 
-		data = data.filter(function (element) {
+		taskData = taskData.filter(function (element) {
 			return element.id !== taskID;
 		});
 
-		this.setState({data});
+		this.setState({data: taskData});
 
-		this.updateCompletion();
+		this.updateCompletion(taskData);
 
 	},
 
@@ -51,12 +50,12 @@ var TaskList = React.createClass({
 		return Date.now().toString();
 	},
 
-	updateCompletion: function(){
+	updateCompletion: function(taskData){
 
 		var completedTasks = 0.0;
 		var taskCount = 0.0;
 
-		this.state.data.map(function (taskItem) {
+		taskData.map(function (taskItem) {
 
 			if(taskItem.completed){
 
@@ -65,24 +64,33 @@ var TaskList = React.createClass({
 			taskCount += 1;
 		}, this);
 
-		var completionRate =  (completedTasks / taskCount) * 100;
+		var completionRate;
+
+		if(taskCount == 0){
+
+			completionRate = 0;
+		}
+		else{
+			completionRate =  (completedTasks / taskCount) * 100;
+
+		}
 
 		this.setState({completion: completionRate});
 
 	},
 
-	handleTaskCompletion: function(taskID, taskCompletion) {
+	handleTaskCompletion: function(taskID, taskIsCompleted) {
 
 		this.state.data.map(function (taskItem) {
 
 			if(taskItem.id == taskID){
 
-				taskItem.completed = taskCompletion;
+				taskItem.completed = taskIsCompleted;
 			}
 
 		}, this);
 
-		this.updateCompletion();
+		this.updateCompletion(this.state.data);
 
 	},
 
