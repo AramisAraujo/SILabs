@@ -53,11 +53,25 @@ var Task = React.createClass({
 
 		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};		
 
+		var ribbon;
+
+		if(this.state.completed){
+			ribbon = (<div className="myBoxTaskRibbon">
+						<span>Done !</span>
+					</div>)
+		}
+
+		else{
+			ribbon = (<div><h1>Empty</h1></div>)
+		}
+
 		}
 
 		return(
-			<div className="myBox">
+			<div className="myBoxTask">
 
+				{ribbon}
+				
 				<h1 style={style}>
 					{this.props.title}
 				</h1>

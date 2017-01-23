@@ -22280,11 +22280,36 @@
 			if (this.state.completed == true) {
 	
 				var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
+	
+				var ribbon;
+	
+				if (this.state.completed) {
+					ribbon = React.createElement(
+						'div',
+						{ className: 'myBoxTaskRibbon' },
+						React.createElement(
+							'span',
+							null,
+							'Done !'
+						)
+					);
+				} else {
+					ribbon = React.createElement(
+						'div',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Empty'
+						)
+					);
+				}
 			}
 	
 			return React.createElement(
 				'div',
-				{ className: 'myBox' },
+				{ className: 'myBoxTask' },
+				ribbon,
 				React.createElement(
 					'h1',
 					{ style: style },
