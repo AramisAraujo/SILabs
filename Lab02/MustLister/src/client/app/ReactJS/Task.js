@@ -53,25 +53,10 @@ var Task = React.createClass({
 
 		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};		
 
-		var ribbon;
-
-		if(this.state.completed){
-			ribbon = (<div className="myBoxTaskRibbon">
-						<span>Done !</span>
-					</div>)
-		}
-
-		else{
-			ribbon = (<div><h1>Empty</h1></div>)
-		}
-
 		}
 
 		return(
-			<div className="myBoxTask">
-
-				{ribbon}
-				
+			<div className="myBoxTask">				
 				<h1 style={style}>
 					{this.props.title}
 				</h1>
@@ -88,11 +73,11 @@ var Task = React.createClass({
         			activeColor="#64B5F6" onChange={this.changeFont}/>
         		</h1>
 
-				<button type="button" style={{backgroundColor: "limegreen"}} className="pure-button pure-button-active"
+				<button type="button" style={{backgroundColor: "limegreen"}} className=""
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
-				<button type="button" style={{backgroundColor: "crimson"}} className="pure-button pure-button-active"
-				 onClick={this.removeTask}>&#xff38;</button>
+				<a type="button"className="close-ribbon"
+				 onClick={this.removeTask}>&times;</a>
 			</div>
 				);}
 
