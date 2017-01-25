@@ -153,7 +153,7 @@ var TaskSubmitter = React.createClass({
 					</div>
 					<div>
 
-						<input type="text" id="task" ref="task" placeholder="I have to..." />
+						<input className="input-text" type="text" id="task" ref="task" placeholder="I have to..." />
 					</div>
 
 					<div>

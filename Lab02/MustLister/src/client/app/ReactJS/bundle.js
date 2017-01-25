@@ -22198,7 +22198,7 @@
 					React.createElement(
 						'div',
 						null,
-						React.createElement('input', { type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
+						React.createElement('input', { className: 'input-text', type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
 					),
 					React.createElement(
 						'div',
