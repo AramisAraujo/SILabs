@@ -22188,26 +22188,22 @@
 					{ onSubmit: this.doSubmit },
 					React.createElement(
 						'div',
-						null,
+						{ className: 'ribbon round' },
 						React.createElement(
-							'label',
-							{ htmlFor: 'task' },
-							'Tell me what you must:'
-						),
-						React.createElement(
-							'div',
+							'h3',
 							null,
-							React.createElement('input', { type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
+							'Tell me what you must:'
 						)
 					),
 					React.createElement(
 						'div',
 						null,
-						React.createElement(
-							'div',
-							null,
-							React.createElement('input', { type: 'submit', value: 'Save Task' })
-						)
+						React.createElement('input', { className: 'input-text', type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
+					),
+					React.createElement(
+						'div',
+						null,
+						React.createElement('input', { type: 'submit', value: 'Save Task' })
 					)
 				)
 			);
@@ -22284,7 +22280,7 @@
 	
 			return React.createElement(
 				'div',
-				{ className: 'myBox' },
+				{ className: 'myBoxTask' },
 				React.createElement(
 					'h1',
 					{ style: style },
@@ -22306,15 +22302,15 @@
 				),
 				React.createElement(
 					'button',
-					{ type: 'button', style: { backgroundColor: "limegreen" }, className: 'pure-button pure-button-active',
+					{ type: 'button', style: { backgroundColor: "limegreen" }, className: '',
 						onClick: this.toggleComplete },
 					'\u2713'
 				),
 				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "crimson" }, className: 'pure-button pure-button-active',
+					'a',
+					{ type: 'button', className: 'close-ribbon',
 						onClick: this.removeTask },
-					'\uFF38'
+					'\xD7'
 				)
 			);
 		}

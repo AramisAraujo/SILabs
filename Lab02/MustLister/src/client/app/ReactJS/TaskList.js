@@ -147,17 +147,19 @@ var TaskSubmitter = React.createClass({
 		return (
 			<div className="myBox">			
 				<form onSubmit={this.doSubmit}>
-					<div>
-						<label htmlFor="task">Tell me what you must:</label>
-						<div>
-							<input type="text" id="task" ref="task" placeholder="I have to..." />
-						</div>
+
+					<div className="ribbon round">
+						<h3>Tell me what you must:</h3>
 					</div>
 					<div>
-						<div>
-							<input type="submit" value="Save Task"/>
-						</div>
+
+						<input className="input-text" type="text" id="task" ref="task" placeholder="I have to..." />
 					</div>
+
+					<div>
+						<input type="submit" value="Save Task"/>
+					</div>
+
 				</form>
 			</div>
 		);
