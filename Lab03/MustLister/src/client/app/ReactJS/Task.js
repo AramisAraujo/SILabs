@@ -8,7 +8,8 @@ var Task = React.createClass({
 	getInitialState: function () {
 
 		return ({color: "black", title: this.props.title,
-		font: "Courier New", id: this.props.taskID, completed: false })
+		font: "Courier New", id: this.props.taskID, completed: false,
+		tags: [], priority: "low", description: "" })
 	},
 
 	removeTask: function(submitEvent) {
