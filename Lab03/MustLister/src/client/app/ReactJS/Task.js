@@ -9,19 +9,19 @@ var Task = React.createClass({
 
 		return ({color: "black", title: this.props.title,
 		font: "Courier New", id: this.props.taskID, completed: false,
-		tags: [], priority: "low", description: "" })
+		tags: [], priority: "low", description: "", subtasks: [] })
 	},
 
 	removeTask: function(submitEvent) {
 
-		submitEvent.preventDefault();//Override default submit event
+		submitEvent.preventDefault();//Overrides default submit event
 		this.props.removeTask(this.state.id);
 		return;
 	},
 
 	toggleComplete: function (toggleEvent) {
 
-		toggleEvent.preventDefault();//Override default toggle event
+		toggleEvent.preventDefault();//Overrides default toggle event
 
 		var completed = this.state.completed === 
 				true ? false : true;
@@ -46,13 +46,71 @@ var Task = React.createClass({
 		return;
 	},
 
+	addTag: function(newTag){
+
+		var tagData = this.state.tags;
+
+		if(tag.trim() != '' && !tagData.include(tag)){
+
+			tagData = tagData.concat([tag]);
+			this.setState({tags: tagData});
+		}
+
+		return;
+	},
+
+	removeTag: function(aTag){
+
+		var tagData = this.state.tags;
+
+		tagData = tagData.filter(function (tagElement) {
+			return tagElement !== aTag;
+		});
+
+		this.setState({tags: tagData});
+
+		return;
+	},
+
+	setPriority: function(newPriority){
+
+		var priorities = ["low","medium","high"];
+
+		newPriority = newPriority.toLowerCase().trim();
+
+		if(priorities.include(priority)){
+
+			this.setState({priority: priority});
+		}
+
+		return;		
+	},
+
+	setDescription: function(description){
+
+		if(description.trim() != ""){
+			this.setState({description:description});
+		}
+
+		return;
+	},
+
+	addSubtask: function(subtask){
+
+		
+	},
+	removeSubtask: function(subtask){
+
+		
+	},
+
 	render: function () {
 
 		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "transparent"};
 
 		if(this.state.completed == true){
 
-		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};		
+			var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};		
 
 		}
 

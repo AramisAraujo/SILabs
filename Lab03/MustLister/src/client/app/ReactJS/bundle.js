@@ -22238,19 +22238,20 @@
 		getInitialState: function getInitialState() {
 	
 			return { color: "black", title: this.props.title,
-				font: "Courier New", id: this.props.taskID, completed: false };
+				font: "Courier New", id: this.props.taskID, completed: false,
+				tags: [], priority: "low", description: "", subtasks: [] };
 		},
 	
 		removeTask: function removeTask(submitEvent) {
 	
-			submitEvent.preventDefault(); //Override default submit event
+			submitEvent.preventDefault(); //Overrides default submit event
 			this.props.removeTask(this.state.id);
 			return;
 		},
 	
 		toggleComplete: function toggleComplete(toggleEvent) {
 	
-			toggleEvent.preventDefault(); //Override default toggle event
+			toggleEvent.preventDefault(); //Overrides default toggle event
 	
 			var completed = this.state.completed === true ? false : true;
 	
@@ -22272,6 +22273,58 @@
 			this.setState({ font: newFont });
 			return;
 		},
+	
+		addTag: function addTag(newTag) {
+	
+			var tagData = this.state.tags;
+	
+			if (tag.trim() != '' && !tagData.include(tag)) {
+	
+				tagData = tagData.concat([tag]);
+				this.setState({ tags: tagData });
+			}
+	
+			return;
+		},
+	
+		removeTag: function removeTag(aTag) {
+	
+			var tagData = this.state.tags;
+	
+			tagData = tagData.filter(function (tagElement) {
+				return tagElement !== aTag;
+			});
+	
+			this.setState({ tags: tagData });
+	
+			return;
+		},
+	
+		setPriority: function setPriority(newPriority) {
+	
+			var priorities = ["low", "medium", "high"];
+	
+			newPriority = newPriority.toLowerCase().trim();
+	
+			if (priorities.include(priority)) {
+	
+				this.setState({ priority: priority });
+			}
+	
+			return;
+		},
+	
+		setDescription: function setDescription(description) {
+	
+			if (description.trim() != "") {
+				this.setState({ description: description });
+			}
+	
+			return;
+		},
+	
+		addSubtask: function addSubtask(subtask) {},
+		removeSubtask: function removeSubtask(subtask) {},
 	
 		render: function render() {
 	
