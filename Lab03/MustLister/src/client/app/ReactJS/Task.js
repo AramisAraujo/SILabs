@@ -78,9 +78,9 @@ var Task = React.createClass({
 
 		newPriority = newPriority.toLowerCase().trim();
 
-		if(priorities.include(priority)){
+		if(priorities.include(newPriority)){
 
-			this.setState({priority: priority});
+			this.setState({priority: newPriority});
 		}
 
 		return;		
