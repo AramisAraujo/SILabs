@@ -2,6 +2,7 @@ import {CirclePicker} from 'react-color';
 
 var React = require('react');
 var FontPicker = require('react-font-picker');
+var SubTask = require('./SubTask.js');
 
 var Task = React.createClass({
 
