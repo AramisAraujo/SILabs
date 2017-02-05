@@ -6,9 +6,9 @@ var TaskList = React.createClass({
 	getInitialState: function () {
 		return{
 			data: [
-				{"id":"00001","title":"Study some more","completed":false},
-				{"id":"00002","title":"Make some neat CSS","completed":false},
-				{"id":"00003","title":"Have some fun","completed":false}
+				{"id":"00001","title":"Study some more","completed":false,"description":"", "priority":"low"},
+				{"id":"00002","title":"Make some neat CSS","completed":false, "description":"","priority":"medium"},
+				{"id":"00003","title":"Have some fun","completed":false, "description":"","priority":"high"}
 			],
 			color: "black",
 			font: "Arial",
@@ -22,8 +22,10 @@ var TaskList = React.createClass({
 		var data = this.state.data;
 		var id = this.generateID();
 		var completed = false;
+		var description = "";
+		var priority = "low";
 
-		data = data.concat([{id,title,completed}]);
+		data = data.concat([{id,title,completed,description,priority}]);
 
 		this.setState({data});
 
@@ -94,6 +96,74 @@ var TaskList = React.createClass({
 
 	},
 
+	handleTaskDescUpdate: function(taskID, newDescription) {
+
+		this.state.data.map(function (taskItem) {
+
+			if(taskItem.id == taskID){
+
+				taskItem.description = newDescription;
+			}
+
+		}, this);
+
+		console.log("updated " + taskID);
+
+		return;
+
+	},
+
+	sortTaskPriority: function() {
+
+		var sortedTasks = this.getHighPriorityTasks();
+
+		sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
+
+		this.setState({data: sortedTasks});
+
+		return;
+	},
+
+	getLowPriorityTasks: function() {
+
+		var taskData = this.state.data;
+
+		var lowTasks = taskData.filter(function (taskItem) {
+			return taskItem.priority == "low";
+		});
+
+		return lowTasks;
+
+	},
+
+	getMedPriorityTasks: function(){
+
+		var taskData = this.state.data;
+
+		var medTasks = taskData.filter(function (taskItem) {
+			return taskItem.priority == "medium";
+		});
+
+		return medTasks;
+
+	},
+
+	getHighPriorityTasks: function(){
+
+		var taskData = this.state.data;
+
+		var highTasks = taskData.filter(function (taskItem) {
+			return taskItem.priority == "high";
+		});
+
+		return highTasks;
+
+	},
+
+	sortTaskName: function() {
+
+	},
+
 	render: function () {
 
 		var listTasks = this.state.data.map(function (taskItem){
@@ -102,6 +172,7 @@ var TaskList = React.createClass({
 				<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
 				completed={taskItem.completed} removeTask={this.handleTaskRemoval}
 				font={this.props.font} updateCompletion = {this.handleTaskCompletion}
+				updateDesc={this.handleTaskDescUpdate}
 				/>
 
 			);
@@ -113,6 +184,7 @@ var TaskList = React.createClass({
 				<h1>Completion rate: {this.state.completion} %</h1>
 				{listTasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
+				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>&#x2713;</button>
 			</ul>
 
 			);
@@ -147,16 +219,12 @@ var TaskSubmitter = React.createClass({
 		return (
 			<div className="myBox">			
 				<form onSubmit={this.doSubmit}>
-					<div>
-						<label htmlFor="task">Tell me what you must:</label>
-						<div>
-							<input type="text" id="task" ref="task" placeholder="I have to..." />
-						</div>
+					<div className="ribbon round">
+						<h3>Tell me what you must:</h3>
 					</div>
+					<input className="input-text" type="text" id="task" ref="task" placeholder="I have to..." />
 					<div>
-						<div>
-							<input type="submit" value="Save Task"/>
-						</div>
+						<input type="submit" value="Save Task"/>
 					</div>
 				</form>
 			</div>

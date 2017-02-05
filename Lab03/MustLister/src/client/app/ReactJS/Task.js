@@ -87,10 +87,17 @@ var Task = React.createClass({
 		return;		
 	},
 
-	setDescription: function(description){
+	setDescription: function(descInputEvent){
 
-		if(description.trim() != ""){
+		var description = this.refs.description.value;
+
+		description = description.trim();
+
+		if(description != "" && description != this.state.description){
+
 			this.setState({description:description});
+			this.refs.description.value = description;
+			this.props.updateDesc(this.state.id, description);
 		}
 
 		return;
@@ -121,7 +128,7 @@ var Task = React.createClass({
 				<h1 style={style}>
 					{this.props.title}
 				</h1>
-
+				{/*
 				<h1>
 					Pick a Color!
 					<CirclePicker color={this.state.color} 
@@ -133,12 +140,14 @@ var Task = React.createClass({
 					<FontPicker label={this.state.font}  previews={false}
         			activeColor="#64B5F6" onChange={this.changeFont}/>
         		</h1>
-
+				*/}
+				<div className="descBox">
+        			<input type="text" placeholder={this.state.description} onBlur={this.setDescription} ref="description"/>
+        		</div>
 				<button type="button" style={{backgroundColor: "limegreen"}} className="pure-button pure-button-active"
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
-				<button type="button" style={{backgroundColor: "crimson"}} className="pure-button pure-button-active"
-				 onClick={this.removeTask}>&#xff38;</button>
+				<a type="button"className="close-ribbon" onClick={this.removeTask}>&times;</a>
 			</div>
 				);}
 

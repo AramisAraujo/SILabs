@@ -22048,7 +22048,7 @@
 	
 		getInitialState: function getInitialState() {
 			return {
-				data: [{ "id": "00001", "title": "Study some more", "completed": false }, { "id": "00002", "title": "Make some neat CSS", "completed": false }, { "id": "00003", "title": "Have some fun", "completed": false }],
+				data: [{ "id": "00001", "title": "Study some more", "completed": false, "description": "", "priority": "low" }, { "id": "00002", "title": "Make some neat CSS", "completed": false, "description": "", "priority": "medium" }, { "id": "00003", "title": "Have some fun", "completed": false, "description": "", "priority": "high" }],
 				color: "black",
 				font: "Arial",
 				completion: 0
@@ -22060,8 +22060,10 @@
 			var data = this.state.data;
 			var id = this.generateID();
 			var completed = false;
+			var description = "";
+			var priority = "low";
 	
-			data = data.concat([{ id: id, title: title, completed: completed }]);
+			data = data.concat([{ id: id, title: title, completed: completed, description: description, priority: priority }]);
 	
 			this.setState({ data: data });
 	
@@ -22125,13 +22127,75 @@
 			this.updateCompletion(this.state.data);
 		},
 	
+		handleTaskDescUpdate: function handleTaskDescUpdate(taskID, newDescription) {
+	
+			this.state.data.map(function (taskItem) {
+	
+				if (taskItem.id == taskID) {
+	
+					taskItem.description = newDescription;
+				}
+			}, this);
+	
+			console.log("updated " + taskID);
+	
+			return;
+		},
+	
+		sortTaskPriority: function sortTaskPriority() {
+	
+			var sortedTasks = this.getHighPriorityTasks();
+	
+			sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
+	
+			this.setState({ data: sortedTasks });
+	
+			return;
+		},
+	
+		getLowPriorityTasks: function getLowPriorityTasks() {
+	
+			var taskData = this.state.data;
+	
+			var lowTasks = taskData.filter(function (taskItem) {
+				return taskItem.priority == "low";
+			});
+	
+			return lowTasks;
+		},
+	
+		getMedPriorityTasks: function getMedPriorityTasks() {
+	
+			var taskData = this.state.data;
+	
+			var medTasks = taskData.filter(function (taskItem) {
+				return taskItem.priority == "medium";
+			});
+	
+			return medTasks;
+		},
+	
+		getHighPriorityTasks: function getHighPriorityTasks() {
+	
+			var taskData = this.state.data;
+	
+			var highTasks = taskData.filter(function (taskItem) {
+				return taskItem.priority == "high";
+			});
+	
+			return highTasks;
+		},
+	
+		sortTaskName: function sortTaskName() {},
+	
 		render: function render() {
 	
 			var listTasks = this.state.data.map(function (taskItem) {
 	
 				return React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
 					completed: taskItem.completed, removeTask: this.handleTaskRemoval,
-					font: this.props.font, updateCompletion: this.handleTaskCompletion
+					font: this.props.font, updateCompletion: this.handleTaskCompletion,
+					updateDesc: this.handleTaskDescUpdate
 				});
 			}, this);
 	
@@ -22151,7 +22215,12 @@
 					' %'
 				),
 				listTasks,
-				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit })
+				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit }),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "gold" }, onClick: this.sortTaskPriority },
+					'\u2713'
+				)
 			);
 		}
 	
@@ -22188,26 +22257,18 @@
 					{ onSubmit: this.doSubmit },
 					React.createElement(
 						'div',
-						null,
+						{ className: 'ribbon round' },
 						React.createElement(
-							'label',
-							{ htmlFor: 'task' },
-							'Tell me what you must:'
-						),
-						React.createElement(
-							'div',
+							'h3',
 							null,
-							React.createElement('input', { type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' })
+							'Tell me what you must:'
 						)
 					),
+					React.createElement('input', { className: 'input-text', type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' }),
 					React.createElement(
 						'div',
 						null,
-						React.createElement(
-							'div',
-							null,
-							React.createElement('input', { type: 'submit', value: 'Save Task' })
-						)
+						React.createElement('input', { type: 'submit', value: 'Save Task' })
 					)
 				)
 			);
@@ -22315,10 +22376,17 @@
 			return;
 		},
 	
-		setDescription: function setDescription(description) {
+		setDescription: function setDescription(descInputEvent) {
 	
-			if (description.trim() != "") {
+			var description = this.refs.description.value;
+	
+			description = description.trim();
+	
+			if (description != "" && description != this.state.description) {
+	
 				this.setState({ description: description });
+				this.refs.description.value = description;
+				this.props.updateDesc(this.state.id, description);
 			}
 	
 			return;
@@ -22345,18 +22413,9 @@
 					this.props.title
 				),
 				React.createElement(
-					'h1',
-					null,
-					'Pick a Color!',
-					React.createElement(_reactColor.CirclePicker, { color: this.state.color,
-						onChangeComplete: this.changeColor })
-				),
-				React.createElement(
-					'h1',
-					null,
-					'Pick a cool Font!',
-					React.createElement(FontPicker, { label: this.state.font, previews: false,
-						activeColor: '#64B5F6', onChange: this.changeFont })
+					'div',
+					{ className: 'descBox' },
+					React.createElement('input', { type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
 				),
 				React.createElement(
 					'button',
@@ -22365,10 +22424,9 @@
 					'\u2713'
 				),
 				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "crimson" }, className: 'pure-button pure-button-active',
-						onClick: this.removeTask },
-					'\uFF38'
+					'a',
+					{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
+					'\xD7'
 				)
 			);
 		}
@@ -36244,7 +36302,10 @@
 			return;
 		},
 	
-		return: function _return() {}
+		render: function render() {
+	
+			return React.createElement('div', null);
+		}
 	
 	});
 	

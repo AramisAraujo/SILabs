@@ -6,7 +6,10 @@ var SubTask = React.createClass({
 		return;
 	},
 
-	return: function(){
+	render: function(){
+
+	return(<div>
+		</div>);
 
 	}
 
