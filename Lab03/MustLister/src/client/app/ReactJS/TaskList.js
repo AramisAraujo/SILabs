@@ -12,7 +12,10 @@ var TaskList = React.createClass({
 			],
 			color: "black",
 			font: "Arial",
-			completion: 0
+			completion: 0,
+			filterTag: "",
+			filterPriority: "",
+			title:"TaskList Title"
 		};
 	},
 
@@ -160,7 +163,58 @@ var TaskList = React.createClass({
 
 	},
 
-	sortTaskName: function() {
+	sortTaskTitle: function() {
+
+		function compareTitle(a,b) {
+  			if (a.title.toLowerCase() < b.title.toLowerCase())
+    			return -1;
+  			if (a.title.toLowerCase() > b.title.toLowerCase())
+   				return 1;
+ 			return 0;
+		}
+
+	var sortedTasks = this.state.data.sort(compareTitle);
+
+	this.setState({data:sortedTasks});
+
+	return;
+
+	},
+
+	filterByPriority: function(priority) {
+
+		var priorities = ["low","medium","high"];
+
+		priority = priority.toLowerCase().trim();
+
+		if(priorities.include(priority)){
+
+			this.setState({filterPriority: priority});
+		}
+
+		return;
+
+	},
+
+	filterByTag: function(tag) {
+
+		tag = tag.toLowerCase().trim();
+
+		this.setState({filterTag: tag});
+
+		return;
+
+	},
+
+	setTitle: function(newTitle) {
+
+		newTitle = newTitle.trim();
+
+		if(newTitle != ""){
+			this.setState({title:newTitle});
+		}
+
+		return;
 
 	},
 
@@ -169,22 +223,25 @@ var TaskList = React.createClass({
 		var listTasks = this.state.data.map(function (taskItem){
 
 			return(
-				<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
-				completed={taskItem.completed} removeTask={this.handleTaskRemoval}
-				font={this.props.font} updateCompletion = {this.handleTaskCompletion}
-				updateDesc={this.handleTaskDescUpdate}
-				/>
+				<li key={taskItem.id}>
+					<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
+					completed={taskItem.completed} removeTask={this.handleTaskRemoval}
+					font={this.props.font} updateCompletion = {this.handleTaskCompletion}
+					updateDesc={this.handleTaskDescUpdate}
+					/>
+				</li>
 
 			);
 		}, this);
 
 		return(
 			<ul className="myBox" onClick={this.handleClick}>
-				<h1>This is a task list:</h1>
+				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
 				{listTasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
-				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>&#x2713;</button>
+				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
+				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>
 			</ul>
 
 			);
