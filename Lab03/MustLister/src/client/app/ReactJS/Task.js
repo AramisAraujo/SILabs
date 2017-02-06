@@ -51,7 +51,7 @@ var Task = React.createClass({
 
 		var tagData = this.state.tags;
 
-		if(tag.trim() != '' && !tagData.include(tag)){
+		if(tag.trim() != '' && !tagData.includes(tag)){
 
 			tagData = tagData.concat([tag]);
 			this.setState({tags: tagData});
@@ -79,7 +79,7 @@ var Task = React.createClass({
 
 		newPriority = newPriority.toLowerCase().trim();
 
-		if(priorities.include(newPriority)){
+		if(priorities.includes(newPriority)){
 
 			this.setState({priority: newPriority});
 		}

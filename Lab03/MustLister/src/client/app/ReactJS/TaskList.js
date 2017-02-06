@@ -173,11 +173,11 @@ var TaskList = React.createClass({
  			return 0;
 		}
 
-	var sortedTasks = this.state.data.sort(compareTitle);
+		var sortedTasks = this.state.data.sort(compareTitle);
 
-	this.setState({data:sortedTasks});
+		this.setState({data:sortedTasks});
 
-	return;
+		return;
 
 	},
 
@@ -189,7 +189,7 @@ var TaskList = React.createClass({
 
 		var filteredTasks;
 
-		if(priorities.include(priority)){
+		if(priorities.includes(priority)){
 
 			this.setState({filterPriority: priority});
 		}
@@ -198,7 +198,7 @@ var TaskList = React.createClass({
 
 	},
 
-	filterByTag: function(taskData, tag) {
+	filterByTag: function(tag) {
 
 		tag = tag.toLowerCase().trim();
 
@@ -234,7 +234,8 @@ var TaskList = React.createClass({
 
 		if(tagFilter != ""){
 			taskData = taskData.map(function (taskItem){
-				return taskItem.tags.include(tagFilter);
+				var tags = taskItem.tags;
+				return tags.includes(tagFilter);
 			});
 		}
 
@@ -258,14 +259,17 @@ var TaskList = React.createClass({
 
 	render: function () {
 
+		var tasks = this.renderTasks();
+
 		return(
 			<ul className="myBox" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
-				{this.renderTasks()}
+				{tasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>
+				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"High")}>Filter Low</button>
 			</ul>
 			);
 

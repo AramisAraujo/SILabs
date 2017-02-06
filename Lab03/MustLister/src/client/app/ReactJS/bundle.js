@@ -22212,7 +22212,7 @@
 	
 			var filteredTasks;
 	
-			if (priorities.include(priority)) {
+			if (priorities.includes(priority)) {
 	
 				this.setState({ filterPriority: priority });
 			}
@@ -22220,7 +22220,7 @@
 			return;
 		},
 	
-		filterByTag: function filterByTag(taskData, tag) {
+		filterByTag: function filterByTag(tag) {
 	
 			tag = tag.toLowerCase().trim();
 	
@@ -22254,7 +22254,8 @@
 	
 			if (tagFilter != "") {
 				taskData = taskData.map(function (taskItem) {
-					return taskItem.tags.include(tagFilter);
+					var tags = taskItem.tags;
+					return tags.includes(tagFilter);
 				});
 			}
 	
@@ -22276,6 +22277,8 @@
 	
 		render: function render() {
 	
+			var tasks = this.renderTasks();
+	
 			return React.createElement(
 				'ul',
 				{ className: 'myBox', onClick: this.handleClick },
@@ -22291,7 +22294,7 @@
 					this.state.completion,
 					' %'
 				),
-				this.renderTasks(),
+				tasks,
 				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit }),
 				React.createElement(
 					'button',
@@ -22302,6 +22305,11 @@
 					'button',
 					{ type: 'button', style: { backgroundColor: "silver" }, onClick: this.sortTaskTitle },
 					'Sort Title'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "High") },
+					'Filter Low'
 				)
 			);
 		}
@@ -22422,7 +22430,7 @@
 	
 			var tagData = this.state.tags;
 	
-			if (tag.trim() != '' && !tagData.include(tag)) {
+			if (tag.trim() != '' && !tagData.includes(tag)) {
 	
 				tagData = tagData.concat([tag]);
 				this.setState({ tags: tagData });
@@ -22450,7 +22458,7 @@
 	
 			newPriority = newPriority.toLowerCase().trim();
 	
-			if (priorities.include(newPriority)) {
+			if (priorities.includes(newPriority)) {
 	
 				this.setState({ priority: newPriority });
 			}
