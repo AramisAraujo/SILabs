@@ -252,8 +252,6 @@ var TaskList = React.createClass({
 			);
 		}, this);
 
-
-
 		return listTasks;
 
 	},
@@ -264,7 +262,7 @@ var TaskList = React.createClass({
 			<ul className="myBox" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
-				{this.renderTasks}
+				{this.renderTasks()}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>

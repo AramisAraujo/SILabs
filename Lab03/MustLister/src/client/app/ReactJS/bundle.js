@@ -22291,7 +22291,7 @@
 					this.state.completion,
 					' %'
 				),
-				this.renderTasks,
+				this.renderTasks(),
 				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit }),
 				React.createElement(
 					'button',
