@@ -22048,7 +22048,7 @@
 	
 		getInitialState: function getInitialState() {
 			return {
-				data: [{ "id": "00001", "title": "Study some more", "completed": false, "description": "", "priority": "low" }, { "id": "00002", "title": "Make some neat CSS", "completed": false, "description": "", "priority": "medium" }, { "id": "00003", "title": "Have some fun", "completed": false, "description": "", "priority": "high" }],
+				data: [{ "id": "00001", "title": "Study some more", "completed": false, tags: [], "description": "", "priority": "low" }, { "id": "00002", "title": "Make some neat CSS", "completed": false, tags: [], "description": "", "priority": "medium" }, { "id": "00003", "title": "Have some fun", "completed": false, tags: [], "description": "", "priority": "high" }],
 				color: "black",
 				font: "Arial",
 				completion: 0,
@@ -22062,11 +22062,12 @@
 	
 			var data = this.state.data;
 			var id = this.generateID();
+			var tags = [];
 			var completed = false;
 			var description = "";
 			var priority = "low";
 	
-			data = data.concat([{ id: id, title: title, completed: completed, description: description, priority: priority }]);
+			data = data.concat([{ id: id, title: title, completed: completed, tags: tags, description: description, priority: priority }]);
 	
 			this.setState({ data: data });
 	
@@ -22215,6 +22216,8 @@
 			if (priorities.includes(priority)) {
 	
 				this.setState({ filterPriority: priority });
+			} else if (priority == "" && this.state.filterPriority != "") {
+				this.setState({ filterPriority: "" });
 			}
 	
 			return;
@@ -22247,14 +22250,15 @@
 			var tagFilter = this.state.filterTag;
 	
 			if (prio != "") {
-				taskData = taskData.map(function (taskItem) {
+				taskData = taskData.filter(function (taskItem) {
 					return taskItem.priority == prio;
 				});
 			}
 	
 			if (tagFilter != "") {
-				taskData = taskData.map(function (taskItem) {
+				taskData = taskData.filter(function (taskItem) {
 					var tags = taskItem.tags;
+					console.log(tags);
 					return tags.includes(tagFilter);
 				});
 			}
@@ -22265,7 +22269,7 @@
 					'li',
 					{ key: taskItem.id },
 					React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
-						completed: taskItem.completed, removeTask: this.handleTaskRemoval,
+						completed: taskItem.completed, tags: taskItem.tags, removeTask: this.handleTaskRemoval,
 						font: this.props.font, updateCompletion: this.handleTaskCompletion,
 						updateDesc: this.handleTaskDescUpdate
 					})
@@ -22309,7 +22313,32 @@
 				React.createElement(
 					'button',
 					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "High") },
+					'Filter High'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Medium") },
+					'Filter Medium'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Low") },
 					'Filter Low'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Low") },
+					'Filter Low'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByPriority.bind(this, "") },
+					'Reset Priority Filter'
+				),
+				React.createElement(
+					'button',
+					{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByTag.bind(this, "") },
+					'Reset Tag Filter'
 				)
 			);
 		}
@@ -22391,7 +22420,7 @@
 	
 			return { color: "black", title: this.props.title,
 				font: "Courier New", id: this.props.taskID, completed: false,
-				tags: [], priority: "low", description: "", subtasks: [] };
+				tags: this.props.tags, priority: "low", description: "", subtasks: [] };
 		},
 	
 		removeTask: function removeTask(submitEvent) {

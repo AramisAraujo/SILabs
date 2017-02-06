@@ -10,7 +10,7 @@ var Task = React.createClass({
 
 		return ({color: "black", title: this.props.title,
 		font: "Courier New", id: this.props.taskID, completed: false,
-		tags: [], priority: "low", description: "", subtasks: [] })
+		tags: this.props.tags, priority: "low", description: "", subtasks: [] })
 	},
 
 	removeTask: function(submitEvent) {
