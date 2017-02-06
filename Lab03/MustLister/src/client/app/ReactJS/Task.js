@@ -123,7 +123,7 @@ var Task = React.createClass({
 		}
 
 		return(
-			<div className="myBox">
+			<div className="myBoxTask">
 
 				<h1 style={style}>
 					{this.props.title}

@@ -14,7 +14,7 @@ var TaskList = React.createClass({
 			font: "Arial",
 			completion: 0,
 			filterTag: "",
-			filterPriority: "",
+			filterPriority:"",
 			title:"TaskList Title"
 		};
 	},
@@ -187,6 +187,8 @@ var TaskList = React.createClass({
 
 		priority = priority.toLowerCase().trim();
 
+		var filteredTasks;
+
 		if(priorities.include(priority)){
 
 			this.setState({filterPriority: priority});
@@ -196,7 +198,7 @@ var TaskList = React.createClass({
 
 	},
 
-	filterByTag: function(tag) {
+	filterByTag: function(taskData, tag) {
 
 		tag = tag.toLowerCase().trim();
 
@@ -218,9 +220,25 @@ var TaskList = React.createClass({
 
 	},
 
-	render: function () {
+	renderTasks: function(){
 
-		var listTasks = this.state.data.map(function (taskItem){
+		var taskData = this.state.data;
+		var prio = this.state.filterPriority;
+		var tagFilter = this.state.filterTag;
+
+		if(prio != ""){
+			taskData = taskData.map(function (taskItem){
+				return taskItem.priority == prio;
+			});
+		}
+
+		if(tagFilter != ""){
+			taskData = taskData.map(function (taskItem){
+				return taskItem.tags.include(tagFilter);
+			});
+		}
+
+		var listTasks = taskData.map(function (taskItem){
 
 			return(
 				<li key={taskItem.id}>
@@ -234,16 +252,23 @@ var TaskList = React.createClass({
 			);
 		}, this);
 
+
+
+		return listTasks;
+
+	},
+
+	render: function () {
+
 		return(
 			<ul className="myBox" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
-				{listTasks}
+				{this.renderTasks}
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>
 			</ul>
-
 			);
 
 
@@ -255,7 +280,7 @@ var TaskSubmitter = React.createClass({
 
 	doSubmit: function (submitEvent) {
 
-		submitEvent.preventDefault(); //Override default submit event
+		submitEvent.preventDefault(); //Overrides default submit event
 
 		var taskTitle = this.refs.task.value.trim();
 
