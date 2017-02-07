@@ -1,5 +1,6 @@
 var React = require('react');
 var Task = require('./Task.js');
+import Request from 'react-http-request';
 
 var TaskList = React.createClass({
 
@@ -226,52 +227,64 @@ var TaskList = React.createClass({
 
 	},
 
-	renderTasks: function(){
+	renderTasks: function(taskData){
 
-		var taskData = this.state.data;
+		// var taskData = this.state.data;
 		var prio = this.state.filterPriority;
 		var tagFilter = this.state.filterTag;
 
-		if(prio != ""){
-			taskData = taskData.filter(function (taskItem){
-				return taskItem.priority == prio;
-			});
-		}
+		// if(prio != ""){
+		// 	taskData = taskData.filter(function (taskItem){
+		// 		return taskItem.priority == prio;
+		// 	});
+		// }
 
-		if(tagFilter != ""){
-			taskData = taskData.filter(function (taskItem){
-				var tags = taskItem.tags;
-				return tags.includes(tagFilter);
-			});
-		}
+		// if(tagFilter != ""){
+		// 	taskData = taskData.filter(function (taskItem){
+		// 		var tags = taskItem.tags;
+		// 		return tags.includes(tagFilter);
+		// 	});
+		// }
 		
-		var listTasks = taskData.map(function (taskItem){
+		// var listTasks = taskData.map(function (taskItem){
 
 			return(
-				<li key={taskItem.id}>
-					<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
-					completed={taskItem.completed} tags={taskItem.tags} removeTask={this.handleTaskRemoval}
+				<li key={taskData.id}>
+					<Task key={taskData.id} taskID={taskData.id} title={taskData.title}
+					completed={taskData.completed} tags={taskData.tags} removeTask={this.handleTaskRemoval}
 					font={this.props.font} updateCompletion = {this.handleTaskCompletion}
 					updateDesc={this.handleTaskDescUpdate}
 					/>
 				</li>
 
 			);
-		}, this);
+		// }, this);
 
-		return listTasks;
+		// return listTasks;
 
 	},
 
 	render: function () {
 
-		var tasks = this.renderTasks();
+		// var tasks = this.renderTasks();
+
 
 		return(
 			<ul className="myBoxList" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
-				{tasks}
+<Request url='http://moda:8080/getLists' method='get' accept='application/json' verbose={true}
+       headers={{"Access-Control-Allow-Origin": "*"}}>
+      {({error, result, loading}) => {
+            if (loading) {
+              return <div>loading...</div>;
+            } else {
+              return this.renderTasks(result);
+            }
+          }
+        }
+
+      </Request>
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>

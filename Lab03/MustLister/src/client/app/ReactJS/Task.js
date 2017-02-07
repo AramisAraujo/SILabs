@@ -117,21 +117,21 @@ var Task = React.createClass({
 
 	},
 
-	renderTags: function(){
+	// renderTags: function(){
 
-		var tags = this.state.tags.map(function (tagItem){
+	// 	var tags = this.state.tags.map(function (tagItem){
 
-			return(
-				<li key={tagItem}>
-					{tagItem}
-				</li>
+	// 		return(
+	// 			<li key={tagItem}>
+	// 				{tagItem}
+	// 			</li>
 
-			);
-		});
+	// 		);
+	// 	});
 
-		return tags;
+	// 	return tags;
 
-	},
+	// },
 
 	render: function () {
 
@@ -143,7 +143,7 @@ var Task = React.createClass({
 
 		}
 
-			var tags = this.renderTags();
+			// var tags = this.renderTags();
 
 		return(
 
@@ -173,8 +173,8 @@ var Task = React.createClass({
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
 				<a type="button"className="close-ribbon" onClick={this.removeTask}>&times;</a>
-				<SubTask title="I am a subTask" checked={false}/>
-				{this.state.tags.toString()}
+				{/*<SubTask title="I am a subTask" checked={false}/>
+				{this.state.tags.toString()}*/}
 			</div>
 				);}
 
