@@ -22048,7 +22048,7 @@
 	
 		getInitialState: function getInitialState() {
 			return {
-				data: [{ "id": "00001", "title": "Study some more", "completed": false, tags: [], "description": "", "priority": "low" }, { "id": "00002", "title": "Make some neat CSS", "completed": false, tags: [], "description": "", "priority": "medium" }, { "id": "00003", "title": "Have some fun", "completed": false, tags: [], "description": "", "priority": "high" }],
+				data: [{ "id": "00001", "title": "Study some more", "completed": false, tags: ["yo", "yeah", "haha", "we are tags"], "description": "", "priority": "low" }, { "id": "00002", "title": "Make some neat CSS", "completed": false, tags: [], "description": "", "priority": "medium" }, { "id": "00003", "title": "Have some fun", "completed": false, tags: [], "description": "", "priority": "high" }],
 				color: "black",
 				font: "Arial",
 				completion: 0,
@@ -22127,6 +22127,8 @@
 					taskItem.completed = taskIsCompleted;
 				}
 			}, this);
+	
+			var newData = this.state.data;
 	
 			this.updateCompletion(this.state.data);
 		},
@@ -22258,7 +22260,6 @@
 			if (tagFilter != "") {
 				taskData = taskData.filter(function (taskItem) {
 					var tags = taskItem.tags;
-					console.log(tags);
 					return tags.includes(tagFilter);
 				});
 			}
@@ -22319,11 +22320,6 @@
 					'button',
 					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Medium") },
 					'Filter Medium'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Low") },
-					'Filter Low'
 				),
 				React.createElement(
 					'button',
@@ -22419,8 +22415,9 @@
 		getInitialState: function getInitialState() {
 	
 			return { color: "black", title: this.props.title,
-				font: "Courier New", id: this.props.taskID, completed: false,
-				tags: this.props.tags, priority: "low", description: "", subtasks: [] };
+				font: "Courier New", id: this.props.taskID, completed: this.props.completed,
+				tags: this.props.tags, priority: this.props.priority,
+				description: this.props.description, subtasks: this.props.subtasks };
 		},
 	
 		removeTask: function removeTask(submitEvent) {
@@ -22514,6 +22511,22 @@
 		addSubtask: function addSubtask(subtask) {},
 		removeSubtask: function removeSubtask(subtask) {},
 	
+		renderSubtask: function renderSubtask() {},
+	
+		renderTags: function renderTags() {
+	
+			var tags = this.state.tags.map(function (tagItem) {
+	
+				return React.createElement(
+					'li',
+					{ key: tagItem },
+					tagItem
+				);
+			});
+	
+			return tags;
+		},
+	
 		render: function render() {
 	
 			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
@@ -22522,6 +22535,8 @@
 	
 				var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
 			}
+	
+			var tags = this.renderTags();
 	
 			return React.createElement(
 				'div',
@@ -22533,8 +22548,8 @@
 				),
 				React.createElement(
 					'div',
-					{ className: 'descBox' },
-					React.createElement('input', { type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
+					null,
+					React.createElement('input', { className: 'descBox', type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
 				),
 				React.createElement(
 					'button',
@@ -22546,7 +22561,9 @@
 					'a',
 					{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
 					'\xD7'
-				)
+				),
+				React.createElement(SubTask, { title: 'I am a subTask', checked: false }),
+				this.state.tags.toString()
 			);
 		}
 	
@@ -36409,21 +36426,41 @@
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	var React = __webpack_require__(/*! react */ 1);
 	
 	var SubTask = React.createClass({
-		displayName: 'SubTask',
+		displayName: "SubTask",
 	
 	
 		getInitialState: function getInitialState() {
-			return;
+	
+			return {
+				checked: this.props.checked,
+				title: this.props.title
+			};
+		},
+	
+		toggleChecked: function toggleChecked() {
+	
+			var isChecked = this.state.checked === true ? false : true;
+	
+			this.setState({ checked: isChecked });
 		},
 	
 		render: function render() {
 	
-			return React.createElement('div', null);
+			return React.createElement(
+				"div",
+				null,
+				React.createElement("input", { id: "Checkbox", name: "Checkbox", type: "checkbox" }),
+				React.createElement(
+					"label",
+					{ htmlFor: "Checkbox" },
+					this.state.title
+				)
+			);
 		}
 	
 	});

@@ -6,7 +6,7 @@ var TaskList = React.createClass({
 	getInitialState: function () {
 		return{
 			data: [
-				{"id":"00001","title":"Study some more","completed":false,tags: [],"description":"", "priority":"low"},
+				{"id":"00001","title":"Study some more","completed":false,tags: ["yo","yeah","haha","we are tags"],"description":"", "priority":"low"},
 				{"id":"00002","title":"Make some neat CSS","completed":false, tags: [], "description":"","priority":"medium"},
 				{"id":"00003","title":"Have some fun","completed":false, tags: [], "description":"","priority":"high"}
 			],
@@ -95,6 +95,8 @@ var TaskList = React.createClass({
 			}
 
 		}, this);
+
+		var newData = this.state.data;
 
 		this.updateCompletion(this.state.data);
 
@@ -239,11 +241,10 @@ var TaskList = React.createClass({
 		if(tagFilter != ""){
 			taskData = taskData.filter(function (taskItem){
 				var tags = taskItem.tags;
-				console.log(tags);
 				return tags.includes(tagFilter);
 			});
 		}
-
+		
 		var listTasks = taskData.map(function (taskItem){
 
 			return(
@@ -276,7 +277,6 @@ var TaskList = React.createClass({
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"High")}>Filter High</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Medium")}>Filter Medium</button>
-				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Low")}>Filter Low</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Low")}>Filter Low</button>
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByPriority.bind(this,"")}>Reset Priority Filter</button>
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByTag.bind(this,"")}>Reset Tag Filter</button>

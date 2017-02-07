@@ -9,8 +9,9 @@ var Task = React.createClass({
 	getInitialState: function () {
 
 		return ({color: "black", title: this.props.title,
-		font: "Courier New", id: this.props.taskID, completed: false,
-		tags: this.props.tags, priority: "low", description: "", subtasks: [] })
+		font: "Courier New", id: this.props.taskID, completed: this.props.completed,
+		tags: this.props.tags, priority: this.props.priority,
+		description: this.props.description, subtasks: this.props.subtasks })
 	},
 
 	removeTask: function(submitEvent) {
@@ -112,6 +113,26 @@ var Task = React.createClass({
 		
 	},
 
+	renderSubtask: function(){
+
+	},
+
+	renderTags: function(){
+
+		var tags = this.state.tags.map(function (tagItem){
+
+			return(
+				<li key={tagItem}>
+					{tagItem}
+				</li>
+
+			);
+		});
+
+		return tags;
+
+	},
+
 	render: function () {
 
 		var style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "transparent"};
@@ -122,7 +143,11 @@ var Task = React.createClass({
 
 		}
 
+			var tags = this.renderTags();
+
 		return(
+
+
 			<div className="myBoxTask">
 
 				<h1 style={style}>
@@ -141,13 +166,15 @@ var Task = React.createClass({
         			activeColor="#64B5F6" onChange={this.changeFont}/>
         		</h1>
 				*/}
-				<div className="descBox">
-        			<input type="text" placeholder={this.state.description} onBlur={this.setDescription} ref="description"/>
+				<div >
+        			<input className="descBox" type="text" placeholder={this.state.description} onBlur={this.setDescription} ref="description"/>
         		</div>
 				<button type="button" style={{backgroundColor: "limegreen"}} className="pure-button pure-button-active"
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
 				<a type="button"className="close-ribbon" onClick={this.removeTask}>&times;</a>
+				<SubTask title="I am a subTask" checked={false}/>
+				{this.state.tags.toString()}
 			</div>
 				);}
 

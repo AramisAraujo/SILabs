@@ -61,6 +61,9 @@
   padding:6px 24px;
   text-decoration:none;
   text-shadow:0px 1px 0px #ffffff;
+  width: 350;
+  height: 290;
+  margin: 0.5em;
 }
 .myBoxTask:hover {
   background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
