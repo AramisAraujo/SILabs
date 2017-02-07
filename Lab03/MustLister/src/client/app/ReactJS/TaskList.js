@@ -268,7 +268,7 @@ var TaskList = React.createClass({
 		var tasks = this.renderTasks();
 
 		return(
-			<ul className="myBox" onClick={this.handleClick}>
+			<ul className="myBoxList" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
 				{tasks}
@@ -311,7 +311,7 @@ var TaskSubmitter = React.createClass({
 
 	render: function() {
 		return (
-			<div className="myBox">			
+			<div className="myBoxInput">			
 				<form onSubmit={this.doSubmit}>
 					<div className="ribbon round">
 						<h3>Tell me what you must:</h3>

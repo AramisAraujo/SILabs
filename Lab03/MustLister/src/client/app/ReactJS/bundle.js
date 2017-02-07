@@ -22286,7 +22286,7 @@
 	
 			return React.createElement(
 				'ul',
-				{ className: 'myBox', onClick: this.handleClick },
+				{ className: 'myBoxList', onClick: this.handleClick },
 				React.createElement(
 					'h1',
 					null,
@@ -22366,7 +22366,7 @@
 		render: function render() {
 			return React.createElement(
 				'div',
-				{ className: 'myBox' },
+				{ className: 'myBoxInput' },
 				React.createElement(
 					'form',
 					{ onSubmit: this.doSubmit },
@@ -22542,7 +22542,7 @@
 				'div',
 				{ className: 'myBoxTask' },
 				React.createElement(
-					'h1',
+					'h2',
 					{ style: style },
 					this.props.title
 				),

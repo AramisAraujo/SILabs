@@ -150,9 +150,9 @@ var Task = React.createClass({
 
 			<div className="myBoxTask">
 
-				<h1 style={style}>
+				<h2 style={style}>
 					{this.props.title}
-				</h1>
+				</h2>
 				{/*
 				<h1>
 					Pick a Color!
