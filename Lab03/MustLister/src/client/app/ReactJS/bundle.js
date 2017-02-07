@@ -22252,6 +22252,13 @@
 			return;
 		},
 	
+		fetchList: function fetchList() {
+	
+			var url = "";
+	
+			jQuery.getJSON(url);
+		},
+	
 		renderTasks: function renderTasks(taskData) {
 	
 			// var taskData = this.state.data;
@@ -22310,7 +22317,8 @@
 				),
 				React.createElement(
 					_reactHttpRequest2.default,
-					{ url: 'http://moda:8080/getLists', method: 'get', accept: 'application/json', verbose: true,
+					{ url: 'http://localhost:8080/getLists', method: 'get',
+						accept: 'application/json', verbose: true,
 						headers: { "Access-Control-Allow-Origin": "*" } },
 					function (_ref) {
 						var error = _ref.error,

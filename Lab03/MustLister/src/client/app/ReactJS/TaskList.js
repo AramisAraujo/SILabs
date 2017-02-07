@@ -227,6 +227,14 @@ var TaskList = React.createClass({
 
 	},
 
+	fetchList: function(){
+
+		const url = "";
+
+		jQuery.getJSON(url);
+
+	},
+
 	renderTasks: function(taskData){
 
 		// var taskData = this.state.data;
@@ -269,22 +277,26 @@ var TaskList = React.createClass({
 		// var tasks = this.renderTasks();
 
 
+
+
 		return(
 			<ul className="myBoxList" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
-<Request url='http://moda:8080/getLists' method='get' accept='application/json' verbose={true}
-       headers={{"Access-Control-Allow-Origin": "*"}}>
-      {({error, result, loading}) => {
-            if (loading) {
-              return <div>loading...</div>;
-            } else {
-              return this.renderTasks(result);
-            }
-          }
-        }
 
-      </Request>
+			<Request url='http://localhost:8080/getLists' method='get'
+			 accept='application/json' verbose={true} 
+			 headers={{"Access-Control-Allow-Origin": "*"}}>
+      			{({error, result, loading}) => {
+            		if (loading) {
+              			return <div>loading...</div>;
+            		} else {
+              			return this.renderTasks(result);
+            			}
+          			}
+        		}
+      		</Request>
+
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
 				<button type="button" style={{backgroundColor: "silver"}} onClick={this.sortTaskTitle}>Sort Title</button>
