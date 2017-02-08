@@ -173,8 +173,8 @@ var Task = React.createClass({
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
 				<a type="button"className="close-ribbon" onClick={this.removeTask}>&times;</a>
-				{/*<SubTask title="I am a subTask" checked={false}/>
-				{this.state.tags.toString()}*/}
+				<SubTask title="I am a subTask" checked={false}/>
+				{/*this.state.tags.toString()*/}
 			</div>
 				);}
 

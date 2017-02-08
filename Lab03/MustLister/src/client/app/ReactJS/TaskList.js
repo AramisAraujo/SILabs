@@ -1,6 +1,8 @@
 var React = require('react');
 var Task = require('./Task.js');
 import Request from 'react-http-request';
+var jQuery = require('jquery');
+
 
 var TaskList = React.createClass({
 
@@ -205,7 +207,9 @@ var TaskList = React.createClass({
 
 	},
 
-	filterByTag: function(tag) {
+	filterByTag: function() {
+
+		var tag = prompt("Input a single tag for filtering","#MyTag");
 
 		tag = tag.toLowerCase().trim();
 
@@ -227,54 +231,65 @@ var TaskList = React.createClass({
 
 	},
 
-	fetchList: function(){
+	fetchList: function(listID){
 
-		const url = "";
+		const url = "http://localhost:8080/getTaskList?id=" + listID ;
 
-		jQuery.getJSON(url);
+		var listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+		listData = [JSON.parse(listData)];
+
+		return listData;
+
+	},
+
+	pushList: function(){
+
+		const url = "http://localhost:8080/updateTaskList";
+		jQuery.ajax({ type: "POST", url: url, id:JSON.stringify(this.state.data), headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 
 	},
 
 	renderTasks: function(taskData){
 
-		// var taskData = this.state.data;
 		var prio = this.state.filterPriority;
 		var tagFilter = this.state.filterTag;
 
-		// if(prio != ""){
-		// 	taskData = taskData.filter(function (taskItem){
-		// 		return taskItem.priority == prio;
-		// 	});
-		// }
+		if(prio != ""){
+			taskData = taskData.filter(function (taskItem){
+				return taskItem.priority == prio;
+			});
+		}
 
-		// if(tagFilter != ""){
-		// 	taskData = taskData.filter(function (taskItem){
-		// 		var tags = taskItem.tags;
-		// 		return tags.includes(tagFilter);
-		// 	});
-		// }
-		
-		// var listTasks = taskData.map(function (taskItem){
+		if(tagFilter != ""){
+			taskData = taskData.filter(function (taskItem){
+				var tags = taskItem.tags;
+				return tags.includes(tagFilter);
+			});
+		}
+
+		var listTasks = taskData.map(function (taskItem){
 
 			return(
-				<li key={taskData.id}>
-					<Task key={taskData.id} taskID={taskData.id} title={taskData.title}
-					completed={taskData.completed} tags={taskData.tags} removeTask={this.handleTaskRemoval}
+				<li key={taskItem.id}>
+					<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
+					completed={taskItem.completed} tags={taskItem.tags} removeTask={this.handleTaskRemoval}
 					font={this.props.font} updateCompletion = {this.handleTaskCompletion}
 					updateDesc={this.handleTaskDescUpdate}
 					/>
 				</li>
 
 			);
-		// }, this);
+		}, this);
 
-		// return listTasks;
+		return listTasks;
 
 	},
 
 	render: function () {
 
-		// var tasks = this.renderTasks();
+		var tasks = this.fetchList("01");
+
 
 
 
@@ -284,18 +299,7 @@ var TaskList = React.createClass({
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
 
-			<Request url='http://localhost:8080/getLists' method='get'
-			 accept='application/json' verbose={true} 
-			 headers={{"Access-Control-Allow-Origin": "*"}}>
-      			{({error, result, loading}) => {
-            		if (loading) {
-              			return <div>loading...</div>;
-            		} else {
-              			return this.renderTasks(result);
-            			}
-          			}
-        		}
-      		</Request>
+				{this.renderTasks(tasks)}
 
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
@@ -303,6 +307,8 @@ var TaskList = React.createClass({
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"High")}>Filter High</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Medium")}>Filter Medium</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Low")}>Filter Low</button>
+				<button type="button" style={{backgroundColor: "aqua"}} onClick={this.filterByTag}>Filter by Tag</button>
+				<button type="button" style={{backgroundColor: "purple"}} onClick={this.pushList}>Test</button>
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByPriority.bind(this,"")}>Reset Priority Filter</button>
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByTag.bind(this,"")}>Reset Tag Filter</button>
 			</ul>
