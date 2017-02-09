@@ -22047,6 +22047,10 @@
 	
 			listsData.map(function (listItem) {
 	
+				if (listItem.data == []) {
+					return 0;
+				}
+	
 				listItem.data.map(function (taskItem) {
 	
 					if (taskItem.completed) {
@@ -22141,6 +22145,8 @@
 			jQuery.ajax({ type: "POST", url: url, data: stuff, contentType: "application/json" });
 	
 			this.setState({ lastUpdated: id });
+	
+			this.updateData();
 	
 			this.forceUpdate();
 		},
@@ -22242,13 +22248,21 @@
 	
 	
 		getInitialState: function getInitialState() {
+	
+			var data = this.props.taskData;
+	
+			if (data == "") {
+				data = [];
+			}
+			var completion = this.getCompletion(data);
+	
 			return {
 				id: this.props.id,
-				data: this.props.taskData,
+				data: data,
 				title: this.props.title,
 				color: this.props.color,
 				font: "Arial",
-				completion: this.getCompletion(this.props.taskData),
+				completion: completion,
 				filterTag: "",
 				filterPriority: ""
 			};
@@ -22264,8 +22278,7 @@
 			var priority = "low";
 			var color = "blue";
 	
-			if (data == "") {
-				data = [];
+			if (data == []) {
 				data = data.concat([{ id: id, title: title, completed: completed, tags: tags, description: description, priority: priority, color: color }]);
 			} else {
 	
@@ -22312,6 +22325,10 @@
 	
 			var completedTasks = 0.0;
 			var taskCount = 0.0;
+	
+			if (taskData = []) {
+				return 0;
+			}
 	
 			taskData.map(function (taskItem) {
 	
@@ -22544,6 +22561,11 @@
 				});
 			}
 	
+			if (taskData == "") {
+	
+				taskData = [];
+			}
+	
 			var listTasks = taskData.map(function (taskItem) {
 	
 				return React.createElement(
@@ -22561,7 +22583,6 @@
 						color: taskItem.color,
 						changeColor: this.handleColorChange,
 						updateTagTask: this.handleTaskTagUpdate
-	
 					})
 				);
 			}, this);
@@ -22577,7 +22598,7 @@
 		render: function render() {
 	
 			var tasks;
-			if (this.state.data != "") {
+			if (this.state.data != []) {
 	
 				tasks = this.renderTasks(this.state.data);
 			} else {
@@ -22712,13 +22733,17 @@
 
 	'use strict';
 	
+	var _React$createClass;
+	
 	var _reactColor = __webpack_require__(/*! react-color */ 181);
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	var React = __webpack_require__(/*! react */ 1);
 	var FontPicker = __webpack_require__(/*! react-font-picker */ 419);
 	var SubTask = __webpack_require__(/*! ./SubTask.js */ 420);
 	
-	var Task = React.createClass({
+	var Task = React.createClass((_React$createClass = {
 		displayName: 'Task',
 	
 	
@@ -22911,69 +22936,85 @@
 			} else {
 				return "red";
 			}
-		},
+		}
 	
-		render: function render() {
+	}, _defineProperty(_React$createClass, 'removeTag', function removeTag() {
+		var tagToRemove = prompt("Input tag for removal", "Tag to Remove");
+		var tags = this.state.tags;
 	
-			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
+		tags = tags.filter(function (tagTitle) {
 	
-			if (this.state.completed == true) {
+			return tagTitle != tagToRemove.toLowerCase();
+		});
 	
-				var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
-			}
+		this.setState({ tags: tags });
 	
-			return React.createElement(
+		this.props.updateTagTask(this.state.id, tags);
+	}), _defineProperty(_React$createClass, 'render', function render() {
+	
+		var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
+	
+		if (this.state.completed == true) {
+	
+			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
+		}
+	
+		return React.createElement(
+			'div',
+			{ className: 'myBoxTask', onDoubleClick: this.togglePriority },
+			React.createElement(
+				'h2',
+				{ style: style },
+				this.props.title
+			),
+			React.createElement(
 				'div',
-				{ className: 'myBoxTask', onDoubleClick: this.togglePriority },
+				null,
+				React.createElement('input', { className: 'descBox', type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
+			),
+			React.createElement(
+				'button',
+				{ type: 'button', style: { backgroundColor: "limegreen" },
+					onClick: this.toggleComplete },
+				'\u2713'
+			),
+			React.createElement(
+				'a',
+				{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
+				'\xD7'
+			),
+			React.createElement(
+				'div',
+				null,
+				'Subtasks:',
+				this.renderSubtasks(),
 				React.createElement(
-					'h2',
-					{ style: style },
-					this.props.title
-				),
+					'button',
+					{ type: 'button', style: { backgroundColor: "orange" },
+						onClick: this.addSubtask },
+					'+'
+				)
+			),
+			React.createElement(
+				'div',
+				null,
+				'Tags:',
+				this.state.tags.toString(),
 				React.createElement(
-					'div',
-					null,
-					React.createElement('input', { className: 'descBox', type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
+					'button',
+					{ type: 'button', style: { backgroundColor: "violet" },
+						onClick: this.addTag },
+					'+'
 				),
 				React.createElement(
 					'button',
-					{ type: 'button', style: { backgroundColor: "limegreen" },
-						onClick: this.toggleComplete },
-					'\u2713'
-				),
-				React.createElement(
-					'a',
-					{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
-					'\xD7'
-				),
-				React.createElement(
-					'div',
-					null,
-					'Subtasks:',
-					this.renderSubtasks(),
-					React.createElement(
-						'button',
-						{ type: 'button', style: { backgroundColor: "orange" },
-							onClick: this.addSubtask },
-						'+'
-					)
-				),
-				React.createElement(
-					'div',
-					null,
-					'Tags:',
-					this.state.tags.toString(),
-					React.createElement(
-						'button',
-						{ type: 'button', style: { backgroundColor: "violet" },
-							onClick: this.addTag },
-						'+'
-					)
+					{ type: 'button', style: { backgroundColor: "#737CEE" },
+						onClick: this.removeTag },
+					'Remove Tag'
 				)
-			);
-		}
-	
-	});
+			)
+		);
+	}), _React$createClass));
 	
 	module.exports = Task;
 

@@ -45,6 +45,10 @@ var TaskBox = React.createClass({
 
 		listsData.map(function (listItem) {
 
+			if(listItem.data == []){
+				return 0;
+			}
+
 			listItem.data.map(function (taskItem){
 
 				if(taskItem.completed){
@@ -148,6 +152,8 @@ var TaskBox = React.createClass({
 		jQuery.ajax({ type: "POST", url: url, data:stuff, contentType: "application/json"});
 
 		this.setState({lastUpdated:id});
+
+		this.updateData();
 
 		this.forceUpdate();
 

@@ -5,13 +5,21 @@ var jQuery = require('jquery');
 var TaskList = React.createClass({
 
 	getInitialState: function () {
+
+		var data = this.props.taskData;
+
+		if(data == ""){
+			data = [];
+		}
+		var completion = this.getCompletion(data);
+
 		return{
 			id:this.props.id,
-			data: this.props.taskData,
+			data: data,
 			title:this.props.title,
 			color: this.props.color,
 			font: "Arial",
-			completion: this.getCompletion(this.props.taskData),
+			completion: completion,
 			filterTag: "",
 			filterPriority:""
 		};
@@ -28,8 +36,7 @@ var TaskList = React.createClass({
 		var priority = "low";
 		var color = "blue";
 
-		if(data == ""){
-			data = [];
+		if(data == []){
 			data = data.concat([{id,title,completed,tags,description,priority,color}]);
 		}
 		else{
@@ -80,6 +87,11 @@ var TaskList = React.createClass({
 
 		var completedTasks = 0.0;
 		var taskCount = 0.0;
+
+		if(taskData = []){
+			return 0;
+		}
+
 
 		taskData.map(function (taskItem) {
 
@@ -339,6 +351,11 @@ var TaskList = React.createClass({
 			});
 		}
 
+		if(taskData == ""){
+			
+			taskData = [];
+		}
+
 		var listTasks = taskData.map(function (taskItem){
 
 			return(
@@ -355,7 +372,6 @@ var TaskList = React.createClass({
 					color={taskItem.color}
 					changeColor={this.handleColorChange}
 					updateTagTask={this.handleTaskTagUpdate}
-
 					/>
 				</li>
 
@@ -374,7 +390,7 @@ var TaskList = React.createClass({
 	render: function () {
 
 		var tasks;
-		if(this.state.data != ""){
+		if(this.state.data != []){
 
 			tasks = this.renderTasks(this.state.data);
 
@@ -404,8 +420,6 @@ var TaskList = React.createClass({
 				<a type="button"className="close-ribbon" onClick={this.removeList}>&times;</a>
 			</ul>
 			);
-
-
 	}
 
 });

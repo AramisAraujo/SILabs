@@ -208,6 +208,21 @@ var Task = React.createClass({
 		}
 	},
 
+	removeTag: function(){
+		var tagToRemove = prompt("Input tag for removal","Tag to Remove");
+		var tags = this.state.tags;
+
+		tags = tags.filter(function (tagTitle){
+
+			return tagTitle != tagToRemove.toLowerCase();
+
+		});
+
+		this.setState({tags:tags});
+
+		this.props.updateTagTask(this.state.id, tags);
+	},
+
 
 	render: function () {
 
@@ -256,6 +271,8 @@ var Task = React.createClass({
 					Tags:{this.state.tags.toString()}
 					<button type="button" style={{backgroundColor: "violet"}} 
 				 onClick={this.addTag}>+</button>
+				 <button type="button" style={{backgroundColor: "#737CEE"}}
+				  onClick={this.removeTag}>Remove Tag</button>
 				</div>
 			</div>
 				);}
