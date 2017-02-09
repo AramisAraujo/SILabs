@@ -1,0 +1,49 @@
+{
+  "id": "00001",
+  "title": "My First TaskList",
+  "data": [
+    {
+      "id": "00001",
+      "title": "Study some more",
+      "completed": false,
+      "tags": [
+        "yo",
+        "yeah",
+        "haha",
+        "we are tags"
+      ],
+      "description": "",
+      "priority": "low",
+      "subtasks": {
+        "title": "WOW",
+        "checked": false
+      }
+    },
+    {
+      "id": "00002",
+      "title": "Make some neat CSS",
+      "completed": false,
+      "tags": [
+        
+      ],
+      "description": "",
+      "priority": "medium",
+      "subtasks": {
+        
+      }
+    },
+    {
+      "id": "00003",
+      "title": "Have some fun",
+      "completed": false,
+      "tags": [
+        
+      ],
+      "description": "",
+      "priority": "high",
+      "subtasks": {
+        
+      }
+    }
+  ]
+}

@@ -87,15 +87,14 @@ var Task = React.createClass({
 
 		if(priorities.includes(newPriority)){
 
-			var color = this.getPriorityColor();
+			var color = this.getPriorityColor(newPriority);
 
-			this.setState({priority: newPriority});
-			this.setState({color:color});
+			this.setState({priority: newPriority, color:color});
 			this.props.changePrio(this.state.id, newPriority);
 			this.props.changeColor(this.state.id, color);
 		}
 
-				
+		this.forceUpdate();		
 	},
 
 	togglePriority: function(){
@@ -147,6 +146,7 @@ var Task = React.createClass({
 
 		
 	},
+
 	removeSubtask: function(subtaskTitle){
 
 		var subtasks = this.state.subtasks.filter(function(subTask){
@@ -161,11 +161,9 @@ var Task = React.createClass({
 
 	renderSubtasks: function(){
 
-
-		if(this.state.subtasks == ""){
+		if(this.state.subtasks == undefined){
 			return;
 		}
-
 
 		var subtasks = this.state.subtasks.map(function (staskItem){
 			var id = this.generateID();
@@ -194,18 +192,15 @@ var Task = React.createClass({
 			}
 		});
 
-
-
 		this.props.updateSTask(this.state.id,subtasks);
 	},
 
-	getPriorityColor: function(){
-		var actualPriority = this.state.priority;
+	getPriorityColor: function(priority){
 
-		if(actualPriority == "low"){
+		if(priority == "low"){
 			return "blue";
 		}
-		else if( actualPriority == "medium"){
+		else if(priority == "medium"){
 			return "orange";
 		}
 		else{

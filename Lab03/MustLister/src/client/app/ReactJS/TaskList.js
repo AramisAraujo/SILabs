@@ -9,7 +9,7 @@ var TaskList = React.createClass({
 			id:this.props.id,
 			data: this.props.taskData,
 			title:this.props.title,
-			color: "black",
+			color: this.props.color,
 			font: "Arial",
 			completion: this.getCompletion(this.props.taskData),
 			filterTag: "",
@@ -26,14 +26,15 @@ var TaskList = React.createClass({
 		var completed = false;
 		var description = "";
 		var priority = "low";
+		var color = "blue";
 
 		if(data == ""){
 			data = [];
-			data = data.concat([{id,title,completed,tags,description,priority}]);
+			data = data.concat([{id,title,completed,tags,description,priority,color}]);
 		}
 		else{
 
-			data = data.concat([{id,title,completed,tags,description,priority}]);
+			data = data.concat([{id,title,completed,tags,description,priority,color}]);
 		}
 
 		this.setState({data});
