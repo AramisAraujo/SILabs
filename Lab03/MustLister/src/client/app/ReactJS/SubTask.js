@@ -6,7 +6,8 @@ var SubTask = React.createClass({
 		
 		return({
 			checked:this.props.checked,
-			title:this.props.title
+			title:this.props.title,
+
 		});
 	},
 
@@ -16,13 +17,24 @@ var SubTask = React.createClass({
 		var isChecked = this.state.checked === true ? false : true;
 
 		this.setState({checked: isChecked});
+
+		this.props.update(this.state.title, isChecked);
+
 	},
 
+	delete: function(){
+
+		this.props.remover(this.state.title);
+
+	},
 	render: function(){
 
+		var title = this.state.title;
+
 	return(<div>
-			<input id="Checkbox" name="Checkbox" type="checkbox"/>
+			<input type="checkbox" checked={this.state.checked} onChange={this.toggleChecked}/>
 			<label htmlFor="Checkbox">{this.state.title}</label>
+			<button type="button" style={{backgroundColor: "red"}} onClick={this.delete}>X</button>
 		</div>
 		);
 	}

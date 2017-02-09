@@ -1,24 +1,19 @@
 var React = require('react');
 var Task = require('./Task.js');
-import Request from 'react-http-request';
 var jQuery = require('jquery');
-
 
 var TaskList = React.createClass({
 
 	getInitialState: function () {
 		return{
-			data: [
-				{"id":"00001","title":"Study some more","completed":false,tags: ["yo","yeah","haha","we are tags"],"description":"", "priority":"low"},
-				{"id":"00002","title":"Make some neat CSS","completed":false, tags: [], "description":"","priority":"medium"},
-				{"id":"00003","title":"Have some fun","completed":false, tags: [], "description":"","priority":"high"}
-			],
+			id:this.props.id,
+			data: this.props.taskData,
+			title:this.props.title,
 			color: "black",
 			font: "Arial",
-			completion: 0,
+			completion: this.getCompletion(this.props.taskData),
 			filterTag: "",
-			filterPriority:"",
-			title:"TaskList Title"
+			filterPriority:""
 		};
 	},
 
@@ -32,11 +27,20 @@ var TaskList = React.createClass({
 		var description = "";
 		var priority = "low";
 
-		data = data.concat([{id,title,completed,tags,description,priority}]);
+		if(data == ""){
+			data = [];
+			data = data.concat([{id,title,completed,tags,description,priority}]);
+		}
+		else{
+
+			data = data.concat([{id,title,completed,tags,description,priority}]);
+		}
 
 		this.setState({data});
 
 		this.updateCompletion(data);
+
+		this.props.saveList(this.state.id, data);
 
 	},
 
@@ -52,6 +56,8 @@ var TaskList = React.createClass({
 
 		this.updateCompletion(taskData);
 
+		this.props.saveList(this.state.id, taskData);
+
 	},
 
 	generateID: function () {
@@ -60,6 +66,16 @@ var TaskList = React.createClass({
 	},
 
 	updateCompletion: function(taskData){
+
+		var completionRate = this.getCompletion(taskData);
+
+		this.setState({completion: completionRate});
+
+		this.props.saveList(this.state.id, taskData);
+
+	},
+
+	getCompletion: function(taskData){
 
 		var completedTasks = 0.0;
 		var taskCount = 0.0;
@@ -84,7 +100,7 @@ var TaskList = React.createClass({
 
 		}
 
-		this.setState({completion: completionRate});
+		return Math.ceil(completionRate);
 
 	},
 
@@ -101,13 +117,15 @@ var TaskList = React.createClass({
 
 		var newData = this.state.data;
 
-		this.updateCompletion(this.state.data);
+		this.updateCompletion(newData);
 
 	},
 
 	handleTaskDescUpdate: function(taskID, newDescription) {
 
-		this.state.data.map(function (taskItem) {
+		var data = this.state.data;
+
+		data.map(function (taskItem) {
 
 			if(taskItem.id == taskID){
 
@@ -116,11 +134,58 @@ var TaskList = React.createClass({
 
 		}, this);
 
-		console.log("updated " + taskID);
-
-		return;
+		this.props.saveList(this.state.id, data);
 
 	},
+	handleTaskTagUpdate: function(taskID, newTags) {
+
+		var data = this.state.data;
+		data.map(function (taskItem) {
+
+			if(taskItem.id == taskID){
+
+				taskItem.tags = newTags;
+			}
+
+		}, this);
+
+		this.props.saveList(this.state.id, data);
+
+	},
+
+	handleTaskSubUpdate: function(taskID,subtaskData){
+
+		var data = this.state.data;
+
+		data.map(function (taskItem) {
+
+			if(taskItem.id == taskID){
+				taskItem.subtasks = subtaskData;
+			}
+
+		}, this);
+
+		this.props.saveList(this.state.id, data);
+
+	},
+
+	handleTaskPrioUpdate: function(taskID,newPriority){
+
+		var data = this.state.data;
+
+		data.map(function (taskItem) {
+
+		if(taskItem.id == taskID){
+
+			taskItem.priority = newPriority;
+			}
+
+		}, this);
+
+		this.props.saveList(this.state.id, data);
+
+	},
+
 
 	sortTaskPriority: function() {
 
@@ -207,9 +272,16 @@ var TaskList = React.createClass({
 
 	},
 
-	filterByTag: function() {
+	filterByTag: function(reset) {
 
-		var tag = prompt("Input a single tag for filtering","#MyTag");
+		var tag;
+		if(reset == true){
+			tag = "";
+		}
+		else{
+
+			tag = prompt("Input a single tag for filtering","#MyTag");
+		}
 
 		tag = tag.toLowerCase().trim();
 
@@ -227,26 +299,24 @@ var TaskList = React.createClass({
 			this.setState({title:newTitle});
 		}
 
-		return;
+		this.props.saveList(this.state.id, this.state.data);
 
 	},
 
-	fetchList: function(listID){
+	handleColorChange: function(taskID, newColor){
 
-		const url = "http://localhost:8080/getTaskList?id=" + listID ;
+		var data = this.state.data;
 
-		var listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+		data.map(function (taskItem) {
 
-		listData = [JSON.parse(listData)];
+		if(taskItem.id == taskID){
 
-		return listData;
+			taskItem.color = newColor;
+			}
 
-	},
+		}, this);
 
-	pushList: function(){
-
-		const url = "http://localhost:8080/updateTaskList";
-		jQuery.ajax({ type: "POST", url: url, id:JSON.stringify(this.state.data), headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+		this.props.saveList(this.state.id, data);
 
 	},
 
@@ -275,7 +345,16 @@ var TaskList = React.createClass({
 					<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
 					completed={taskItem.completed} tags={taskItem.tags} removeTask={this.handleTaskRemoval}
 					font={this.props.font} updateCompletion = {this.handleTaskCompletion}
+					description={taskItem.description}
+					priority={taskItem.priority}
+					subtasks={taskItem.subtasks}
 					updateDesc={this.handleTaskDescUpdate}
+					updateSTask={this.handleTaskSubUpdate}
+					changePrio={this.handleTaskPrioUpdate}
+					color={taskItem.color}
+					changeColor={this.handleColorChange}
+					updateTagTask={this.handleTaskTagUpdate}
+
 					/>
 				</li>
 
@@ -286,20 +365,30 @@ var TaskList = React.createClass({
 
 	},
 
+	removeList: function(){
+
+		this.props.removeList(this.state.id);
+	},
+
 	render: function () {
 
-		var tasks = this.fetchList("01");
+		var tasks;
+		if(this.state.data != ""){
 
+			tasks = this.renderTasks(this.state.data);
 
+		}
 
-
+		else{
+			tasks = "";
+		}
 
 		return(
-			<ul className="myBoxList" onClick={this.handleClick}>
+			<ul key={this.state.id} className="myBoxList" onClick={this.handleClick}>
 				<h1>{this.state.title}</h1>
 				<h1>Completion rate: {this.state.completion} %</h1>
 
-				{this.renderTasks(tasks)}
+				{tasks}
 
 				<TaskSubmitter onTaskSubmit={this.handleTaskSubmit}/>
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.sortTaskPriority}>Sort Priority</button>
@@ -308,9 +397,10 @@ var TaskList = React.createClass({
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Medium")}>Filter Medium</button>
 				<button type="button" style={{backgroundColor: "pink"}} onClick={this.filterByPriority.bind(this,"Low")}>Filter Low</button>
 				<button type="button" style={{backgroundColor: "aqua"}} onClick={this.filterByTag}>Filter by Tag</button>
-				<button type="button" style={{backgroundColor: "purple"}} onClick={this.pushList}>Test</button>
+
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByPriority.bind(this,"")}>Reset Priority Filter</button>
-				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByTag.bind(this,"")}>Reset Tag Filter</button>
+				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByTag.bind(this,true)}>Reset Tag Filter</button>
+				<a type="button"className="close-ribbon" onClick={this.removeList}>&times;</a>
 			</ul>
 			);
 

@@ -8,10 +8,10 @@ var Task = React.createClass({
 
 	getInitialState: function () {
 
-		return ({color: "black", title: this.props.title,
+		return ({color: this.props.color, title: this.props.title,
 		font: "Courier New", id: this.props.taskID, completed: this.props.completed,
 		tags: this.props.tags, priority: this.props.priority,
-		description: this.props.description, subtasks: this.props.subtasks })
+		description: this.props.description, subtasks: this.props.subtasks})
 	},
 
 	removeTask: function(submitEvent) {
@@ -48,14 +48,19 @@ var Task = React.createClass({
 		return;
 	},
 
-	addTag: function(newTag){
+	addTag: function(){
 
-		var tagData = this.state.tags;
+		var tagTitle = prompt("Insert new Tag:","Your Tag Here");
 
-		if(tag.trim() != '' && !tagData.includes(tag)){
+		if(tagTitle.trim() != '' && !this.state.tags.includes(tagTitle)){
 
-			tagData = tagData.concat([tag]);
-			this.setState({tags: tagData});
+			var tags = this.state.tags;
+
+			tags.push(tagTitle);
+
+			this.setState({tags:tags});
+
+			this.props.updateTagTask(this.state.id, tags);
 		}
 
 		return;
@@ -82,10 +87,35 @@ var Task = React.createClass({
 
 		if(priorities.includes(newPriority)){
 
+			var color = this.getPriorityColor();
+
 			this.setState({priority: newPriority});
+			this.setState({color:color});
+			this.props.changePrio(this.state.id, newPriority);
+			this.props.changeColor(this.state.id, color);
 		}
 
-		return;		
+				
+	},
+
+	togglePriority: function(){
+
+		var newPriority;
+		var actualPriority = this.state.priority;
+
+		if(actualPriority == "low"){
+			newPriority = "medium";
+		}
+		else if(actualPriority == "medium"){
+			newPriority = "high";
+		}
+		else if (actualPriority == "high"){
+			newPriority = "low";
+		}
+
+		this.setPriority(newPriority);
+
+
 	},
 
 	setDescription: function(descInputEvent){
@@ -104,34 +134,85 @@ var Task = React.createClass({
 		return;
 	},
 
-	addSubtask: function(subtask){
+	addSubtask: function(){
+
+		var title = prompt("Insert new SubTask Title:","SubTask Title");
+		var checked = false;
+
+		var subtaskData = this.state.subtasks.concat([{title,checked}]);
+
+		this.setState({subtasks:subtaskData});
+
+		this.props.updateSTask(this.state.id, subtaskData);
 
 		
 	},
-	removeSubtask: function(subtask){
+	removeSubtask: function(subtaskTitle){
 
+		var subtasks = this.state.subtasks.filter(function(subTask){
+			return subTask.title != subtaskTitle;
+		});
+
+		this.setState({subtasks:subtasks});
+
+		this.props.updateSTask(this.state.id,subtasks);
 		
 	},
 
-	renderSubtask: function(){
+	renderSubtasks: function(){
 
+
+		if(this.state.subtasks == ""){
+			return;
+		}
+
+
+		var subtasks = this.state.subtasks.map(function (staskItem){
+			var id = this.generateID();
+
+			return(<SubTask key={id} title={staskItem.title} 
+				checked={staskItem.checked} update={this.handleSubUpdate}
+				remover={this.removeSubtask}
+			/>);
+		}, this);
+
+		return subtasks;
 	},
 
-	// renderTags: function(){
+	generateID: function () {
 
-	// 	var tags = this.state.tags.map(function (tagItem){
+		return Date.now().toString();
+	},
 
-	// 		return(
-	// 			<li key={tagItem}>
-	// 				{tagItem}
-	// 			</li>
+	handleSubUpdate: function(title, checked){
+	
+	var subtasks = this.state.subtasks;
 
-	// 		);
-	// 	});
+	subtasks.map(function(subTask){
+			if(subTask.title == title){
+				subTask.checked = checked;
+			}
+		});
 
-	// 	return tags;
 
-	// },
+
+		this.props.updateSTask(this.state.id,subtasks);
+	},
+
+	getPriorityColor: function(){
+		var actualPriority = this.state.priority;
+
+		if(actualPriority == "low"){
+			return "blue";
+		}
+		else if( actualPriority == "medium"){
+			return "orange";
+		}
+		else{
+			return "red";
+		}
+	},
+
 
 	render: function () {
 
@@ -143,12 +224,10 @@ var Task = React.createClass({
 
 		}
 
-			// var tags = this.renderTags();
-
 		return(
 
 
-			<div className="myBoxTask">
+			<div className="myBoxTask" onDoubleClick={this.togglePriority}>
 
 				<h2 style={style}>
 					{this.props.title}
@@ -169,12 +248,20 @@ var Task = React.createClass({
 				<div >
         			<input className="descBox" type="text" placeholder={this.state.description} onBlur={this.setDescription} ref="description"/>
         		</div>
-				<button type="button" style={{backgroundColor: "limegreen"}} className="pure-button pure-button-active"
+				<button type="button" style={{backgroundColor: "limegreen"}} 
 				 onClick={this.toggleComplete}>&#x2713;</button>
 
-				<a type="button"className="close-ribbon" onClick={this.removeTask}>&times;</a>
-				<SubTask title="I am a subTask" checked={false}/>
-				{/*this.state.tags.toString()*/}
+				<a type="button" className="close-ribbon" onClick={this.removeTask}>&times;</a>
+				<div>
+					Subtasks:{this.renderSubtasks()}
+					<button type="button" style={{backgroundColor: "orange"}} 
+				 onClick={this.addSubtask}>+</button>
+				</div>
+				<div>
+					Tags:{this.state.tags.toString()}
+					<button type="button" style={{backgroundColor: "violet"}} 
+				 onClick={this.addTag}>+</button>
+				</div>
 			</div>
 				);}
 
