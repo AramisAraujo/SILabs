@@ -1,29 +1,64 @@
 package com.example;
 
-public class TaskList {
+import java.io.Serializable;
+import java.util.List;
 
-	private String id;
-	private Task[] tasks;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-	public TaskList(String id, Task[] tasks) {
+@Entity
+public class TaskList implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4900109026264138579L;
+
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private long id;
+	
+	private String title;
+	
+	@OneToMany(targetEntity=Task.class)
+	private List<Task> tasks;
+
+	public TaskList(String title, List<Task> tasks) {
 		super();
-		this.id = id;
+		this.title = title;
 		this.tasks = tasks;
 	}
+	
+	protected TaskList(){
+		
+	}
 
-	public String getId() {
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public Task[] getTasks() {
+	public List<Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(Task[] tasks) {
+	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
 	

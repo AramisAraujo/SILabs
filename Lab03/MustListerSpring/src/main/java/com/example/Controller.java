@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +22,53 @@ import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
 @RestController
-public class TaskListController {
+public class Controller {
+	
+	@Autowired
+	SubtaskRepository subTaskRepo;
+	
+	@Autowired
+	TaskRepository taskRepo;
+	
+	@Autowired
+	TaskListRepository taskListRepo;
 
 	private final String TASK_LIST_PATH_SAMPLE = "taskList";
 	private final String JSON_EXTENSION = ".json";
+
+	@CrossOrigin
+	@RequestMapping("/testPSQL")
+	public void testCreateList() {
+
+		Subtask subT = new Subtask("Do Something", false);
+		
+		subTaskRepo.save(subT);
+		System.out.println("Subtask Salva!");
+
+		List<Subtask> stList = new ArrayList<Subtask>();
+		stList.add(subT);
+
+		List<String> tags = new ArrayList<String>();
+		
+		tags.add("Urgente");
+		tags.add("Importante");
+				
+		Task aTask = new Task("", "My first Task", "", false, tags, "low", "a task", stList);
+		
+		taskRepo.save(aTask);
+		
+		System.out.println("Task Salva!");
+
+		List<Task> taskList = new ArrayList<Task>();
+
+		taskList.add(aTask);
+
+		taskListRepo.save(new TaskList("My List",taskList));
+		
+
+		System.out.println("Lista criada !");
+		
+	}
 
 	@CrossOrigin
 	@RequestMapping("/getTaskList")
@@ -55,35 +98,35 @@ public class TaskListController {
 		return ids;
 
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping("/deleteList")
-	public void deleteList(@RequestParam(value = "id") String id){
-		
+	public void deleteList(@RequestParam(value = "id") String id) {
+
 		String path = this.getPathToList(id);
-		
+
 		File toDelete = new File(path);
-		
+
 		toDelete.delete();
-		
-		System.out.println("Deleted file "+path);
-		
+
+		System.out.println("Deleted file " + path);
+
 	}
 
 	@CrossOrigin
 	@RequestMapping(value = "/createNewList", method = RequestMethod.POST)
 	public void createNewList(@RequestBody Map<String, Object> stuff) throws ParseException, JsonProcessingException {
-		
+
 		String param = new ObjectMapper().writeValueAsString(stuff);
 
 		String id = (String) stuff.get("id");
-		
+
 		String title = (String) stuff.get("title");
-		
-		String emptyList = String.format("{'id':'%s','title':'%s', 'data':''}", id,title);
-		
+
+		String emptyList = String.format("{'id':'%s','title':'%s', 'data':''}", id, title);
+
 		emptyList = emptyList.replaceAll("'", "\"");
-		
+
 		@SuppressWarnings("deprecation")
 		JSONParser parser = new JSONParser();
 
@@ -92,19 +135,19 @@ public class TaskListController {
 		this.writeJson(id, empty);
 
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping(value = "/saveList", method = RequestMethod.POST)
-	public void saveTaskList(@RequestBody Map<String, Object> listData) throws ParseException, JsonProcessingException{
-		
+	public void saveTaskList(@RequestBody Map<String, Object> listData) throws ParseException, JsonProcessingException {
+
 		String param = new ObjectMapper().writeValueAsString(listData);
 		String id = (String) listData.get("id");
-		
+
 		@SuppressWarnings("deprecation")
 		JSONParser parser = new JSONParser();
-		
+
 		JSONObject list = (JSONObject) parser.parse(param);
-		
+
 		this.writeJson(id, list);
 		System.out.println("wrote by id " + id);
 	}
@@ -121,10 +164,10 @@ public class TaskListController {
 			Object obj = parser.parse(new FileReader(pathToJson));
 
 			JSONObject jsonObject = (JSONObject) obj;
-			
+
 			String rep = jsonObject.toJSONString();
 
-			if(rep.equals("{}")){
+			if (rep.equals("{}")) {
 				return "";
 			}
 			return rep;

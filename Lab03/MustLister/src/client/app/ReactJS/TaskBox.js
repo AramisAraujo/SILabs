@@ -1,14 +1,14 @@
 
-var React = require('react');
-var TaskList = require('./TaskList.js');
-var jQuery = require('jquery');
+let React = require('react');
+let TaskList = require('./TaskList.js');
+let jQuery = require('jquery');
 
-var TaskBox = React.createClass({
+let TaskBox = React.createClass({
 
 	getInitialState: function(){
 
-		var now = Date.now().toString();
-		var listsData = this.fetchLists();
+		let now = Date.now().toString();
+		let listsData = this.fetchLists();
 
 		return{
 
@@ -19,8 +19,8 @@ var TaskBox = React.createClass({
 
 	updateData: function(){
 
-		var listsData = this.fetchLists();
-		var completion = this.getCompletion(listsData);
+		let listsData = this.fetchLists();
+		let completion = this.getCompletion(listsData);
 
 		this.setState({listsData:listsData});
 		this.setState({completion:completion});
@@ -29,7 +29,7 @@ var TaskBox = React.createClass({
 
 	saveLists: function(){
 
-		var listIds = this.getListsID;
+		let listIds = this.getListsID;
 
 		listsIds.map(function (id){
 			saveListId(id);
@@ -40,8 +40,8 @@ var TaskBox = React.createClass({
 
 	getCompletion: function(listsData){
 
-		var completedTasks = 0.0;
-		var taskCount = 0.0;
+		let completedTasks = 0.0;
+		let taskCount = 0.0;
 
 		listsData.map(function (listItem) {
 
@@ -60,7 +60,7 @@ var TaskBox = React.createClass({
 
 
 			});
-		var completionRate;
+		let completionRate;
 
 		if(taskCount == 0){
 
@@ -79,9 +79,9 @@ var TaskBox = React.createClass({
 
 		this.updateData();
 
-		var listsData = this.state.listsData;
+		let listsData = this.state.listsData;
 
-		var listData = listsData.filter(function (listItem){
+		let listData = listsData.filter(function (listItem){
 
 				if(listItem.id == listID){
 					listItem.data = newData;
@@ -101,15 +101,15 @@ var TaskBox = React.createClass({
 
 	fetchLists: function(){
 
-		var listIds = this.getListsID();
+		let listIds = this.getListsID();
 
-		var listsData = [];
+		let listsData = [];
 
 		listIds.map(function (listID){
 
-			var url = "http://localhost:8080/getTaskList?id=" + listID;
+			let url = "http://localhost:8080/getTaskList?id=" + listID;
 
-			var listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+			let listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
 			listData = JSON.parse(listData);
 
@@ -131,7 +131,7 @@ var TaskBox = React.createClass({
 
 		const url = "http://localhost:8080/getListsID";
 
-		var listIds = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+		let listIds = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
 		return JSON.parse(listIds);
 
@@ -139,11 +139,11 @@ var TaskBox = React.createClass({
 
 	createNewList: function(){
 
-		var listTitle = prompt("Insert new TaskList Title","TaskList Title");
+		let listTitle = prompt("Insert new TaskList Title","TaskList Title");
 
-		var id = this.generateID();
+		let id = this.generateID();
 
-		var stuff = ({"id":id,"title":listTitle,"data":{}});
+		let stuff = ({"id":id,"title":listTitle,"data":{}});
 
 		stuff = JSON.stringify(stuff);
 
@@ -166,11 +166,11 @@ var TaskBox = React.createClass({
 
 	renderTaskLists: function(){
 
-		var lists = this.fetchLists();
+		let lists = this.fetchLists();
 
-		var renderedLists = lists.map(function (taskList){
+		let renderedLists = lists.map(function (taskList){
 
-			var data = taskList.data;
+			let data = taskList.data;
 
 			return(<TaskList key={taskList.id} id={taskList.id}
 				taskData={data}
@@ -187,7 +187,7 @@ var TaskBox = React.createClass({
 
 		const url = "http://localhost:8080/deleteList?id=" + listId;
 
-		var listIds = jQuery.ajax({ type: "GET", url: url, async: false});
+		let listIds = jQuery.ajax({ type: "GET", url: url, async: false});
 
 
 		this.updateData();

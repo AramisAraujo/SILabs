@@ -1,6 +1,6 @@
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var TaskBox = require('./TaskBox.js');
+let React = require('react');
+let ReactDOM = require('react-dom');
+let TaskBox = require('./TaskBox.js');
 
 ReactDOM.render(<TaskBox />, document.getElementById('app'));

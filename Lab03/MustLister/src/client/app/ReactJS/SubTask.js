@@ -1,6 +1,6 @@
-var React = require('react');
+let React = require('react');
 
-var SubTask = React.createClass({
+let SubTask = React.createClass({
 
 	getInitialState: function() {
 		
@@ -14,7 +14,7 @@ var SubTask = React.createClass({
 
 	toggleChecked: function(){
 
-		var isChecked = this.state.checked === true ? false : true;
+		let isChecked = this.state.checked === true ? false : true;
 
 		this.setState({checked: isChecked});
 
@@ -29,7 +29,7 @@ var SubTask = React.createClass({
 	},
 	render: function(){
 
-		var title = this.state.title;
+		let title = this.state.title;
 
 	return(<div>
 			<input type="checkbox" checked={this.state.checked} onChange={this.toggleChecked}/>

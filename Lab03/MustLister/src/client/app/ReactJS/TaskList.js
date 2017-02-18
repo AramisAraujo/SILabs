@@ -1,17 +1,17 @@
-var React = require('react');
-var Task = require('./Task.js');
-var jQuery = require('jquery');
+let React = require('react');
+let Task = require('./Task.js');
+let jQuery = require('jquery');
 
-var TaskList = React.createClass({
+let TaskList = React.createClass({
 
 	getInitialState: function () {
 
-		var data = this.props.taskData;
+		let data = this.props.taskData;
 
 		if(data == ""){
 			data = [];
 		}
-		var completion = this.getCompletion(data);
+		let completion = this.getCompletion(data);
 
 		return{
 			id:this.props.id,
@@ -28,13 +28,13 @@ var TaskList = React.createClass({
 
 	handleTaskSubmit: function (title) {
 
-		var data = this.state.data;
-		var id = this.generateID();
-		var tags = [];
-		var completed = false;
-		var description = "";
-		var priority = "low";
-		var color = "blue";
+		let data = this.state.data;
+		let id = this.generateID();
+		let tags = [];
+		let completed = false;
+		let description = "";
+		let priority = "low";
+		let color = "blue";
 
 		if(data == []){
 			data = data.concat([{id,title,completed,tags,description,priority,color}]);
@@ -54,7 +54,7 @@ var TaskList = React.createClass({
 
 	handleTaskRemoval: function(taskID) {
 
-		var taskData = this.state.data;
+		let taskData = this.state.data;
 
 		taskData = taskData.filter(function (element) {
 			return element.id !== taskID;
@@ -75,7 +75,7 @@ var TaskList = React.createClass({
 
 	updateCompletion: function(taskData){
 
-		var completionRate = this.getCompletion(taskData);
+		let completionRate = this.getCompletion(taskData);
 
 		this.setState({completion: completionRate});
 
@@ -85,8 +85,8 @@ var TaskList = React.createClass({
 
 	getCompletion: function(taskData){
 
-		var completedTasks = 0.0;
-		var taskCount = 0.0;
+		let completedTasks = 0.0;
+		let taskCount = 0.0;
 
 		if(taskData = []){
 			return 0;
@@ -102,7 +102,7 @@ var TaskList = React.createClass({
 			taskCount += 1;
 		}, this);
 
-		var completionRate;
+		let completionRate;
 
 		if(taskCount == 0){
 
@@ -128,7 +128,7 @@ var TaskList = React.createClass({
 
 		}, this);
 
-		var newData = this.state.data;
+		let newData = this.state.data;
 
 		this.updateCompletion(newData);
 
@@ -136,7 +136,7 @@ var TaskList = React.createClass({
 
 	handleTaskDescUpdate: function(taskID, newDescription) {
 
-		var data = this.state.data;
+		let data = this.state.data;
 
 		data.map(function (taskItem) {
 
@@ -152,7 +152,7 @@ var TaskList = React.createClass({
 	},
 	handleTaskTagUpdate: function(taskID, newTags) {
 
-		var data = this.state.data;
+		let data = this.state.data;
 		data.map(function (taskItem) {
 
 			if(taskItem.id == taskID){
@@ -168,7 +168,7 @@ var TaskList = React.createClass({
 
 	handleTaskSubUpdate: function(taskID,subtaskData){
 
-		var data = this.state.data;
+		let data = this.state.data;
 
 		data.map(function (taskItem) {
 
@@ -184,7 +184,7 @@ var TaskList = React.createClass({
 
 	handleTaskPrioUpdate: function(taskID,newPriority){
 
-		var data = this.state.data;
+		let data = this.state.data;
 
 		data.map(function (taskItem) {
 
@@ -202,7 +202,7 @@ var TaskList = React.createClass({
 
 	sortTaskPriority: function() {
 
-		var sortedTasks = this.getHighPriorityTasks();
+		let sortedTasks = this.getHighPriorityTasks();
 
 		sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
 
@@ -213,9 +213,9 @@ var TaskList = React.createClass({
 
 	getLowPriorityTasks: function() {
 
-		var taskData = this.state.data;
+		let taskData = this.state.data;
 
-		var lowTasks = taskData.filter(function (taskItem) {
+		let lowTasks = taskData.filter(function (taskItem) {
 			return taskItem.priority == "low";
 		});
 
@@ -225,9 +225,9 @@ var TaskList = React.createClass({
 
 	getMedPriorityTasks: function(){
 
-		var taskData = this.state.data;
+		let taskData = this.state.data;
 
-		var medTasks = taskData.filter(function (taskItem) {
+		let medTasks = taskData.filter(function (taskItem) {
 			return taskItem.priority == "medium";
 		});
 
@@ -237,9 +237,9 @@ var TaskList = React.createClass({
 
 	getHighPriorityTasks: function(){
 
-		var taskData = this.state.data;
+		let taskData = this.state.data;
 
-		var highTasks = taskData.filter(function (taskItem) {
+		let highTasks = taskData.filter(function (taskItem) {
 			return taskItem.priority == "high";
 		});
 
@@ -257,7 +257,7 @@ var TaskList = React.createClass({
  			return 0;
 		}
 
-		var sortedTasks = this.state.data.sort(compareTitle);
+		let sortedTasks = this.state.data.sort(compareTitle);
 
 		this.setState({data:sortedTasks});
 
@@ -267,11 +267,11 @@ var TaskList = React.createClass({
 
 	filterByPriority: function(priority) {
 
-		var priorities = ["low","medium","high"];
+		let priorities = ["low","medium","high"];
 
 		priority = priority.toLowerCase().trim();
 
-		var filteredTasks;
+		let filteredTasks;
 
 		if(priorities.includes(priority)){
 
@@ -287,7 +287,7 @@ var TaskList = React.createClass({
 
 	filterByTag: function(reset) {
 
-		var tag;
+		let tag;
 		if(reset == true){
 			tag = "";
 		}
@@ -318,7 +318,7 @@ var TaskList = React.createClass({
 
 	handleColorChange: function(taskID, newColor){
 
-		var data = this.state.data;
+		let data = this.state.data;
 
 		data.map(function (taskItem) {
 
@@ -335,8 +335,8 @@ var TaskList = React.createClass({
 
 	renderTasks: function(taskData){
 
-		var prio = this.state.filterPriority;
-		var tagFilter = this.state.filterTag;
+		let prio = this.state.filterPriority;
+		let tagFilter = this.state.filterTag;
 
 		if(prio != ""){
 			taskData = taskData.filter(function (taskItem){
@@ -346,7 +346,7 @@ var TaskList = React.createClass({
 
 		if(tagFilter != ""){
 			taskData = taskData.filter(function (taskItem){
-				var tags = taskItem.tags;
+				let tags = taskItem.tags;
 				return tags.includes(tagFilter);
 			});
 		}
@@ -356,7 +356,7 @@ var TaskList = React.createClass({
 			taskData = [];
 		}
 
-		var listTasks = taskData.map(function (taskItem){
+		let listTasks = taskData.map(function (taskItem){
 
 			return(
 				<li key={taskItem.id}>
@@ -389,7 +389,7 @@ var TaskList = React.createClass({
 
 	render: function () {
 
-		var tasks;
+		let tasks;
 		if(this.state.data != []){
 
 			tasks = this.renderTasks(this.state.data);
@@ -424,13 +424,13 @@ var TaskList = React.createClass({
 
 });
 
-var TaskSubmitter = React.createClass({
+let TaskSubmitter = React.createClass({
 
 	doSubmit: function (submitEvent) {
 
 		submitEvent.preventDefault(); //Overrides default submit event
 
-		var taskTitle = this.refs.task.value.trim();
+		let taskTitle = this.refs.task.value.trim();
 
 		if(taskTitle == ""){
 

@@ -1,22 +1,47 @@
 package com.example;
 
-public class Task {
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
+public class Task implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5263039426747289247L;
+
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy=GenerationType.AUTO) 
+	private long id;
 	
-	@SuppressWarnings("unused")
-	private final String id;
 	private String color;
 	private String title;
 	private String font;
 	private boolean completed;
-	private String tags[];
+	
+	@ElementCollection
+	private List<String> tags;
+	
 	private String priority;
 	private String description;
-	private Subtask subtasks[];
 	
-	public Task(String id, String color, String title, String font, boolean completed, String[] tags, String priority,
-			String description, Subtask subtasks[]) {
+	@OneToMany(targetEntity=Subtask.class)
+	private List<Subtask> subtasks;
+	
+
+	public Task(String color, String title, String font, boolean completed, List<String> tags, String priority,
+			String description, List<Subtask> subtasks) {
 		super();
-		this.id = id;
 		this.color = color;
 		this.title = title;
 		this.font = font;
@@ -25,6 +50,18 @@ public class Task {
 		this.priority = priority;
 		this.description = description;
 		this.subtasks = subtasks;
+	}
+	
+	protected Task(){
+		
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getColor() {
@@ -59,11 +96,11 @@ public class Task {
 		this.completed = completed;
 	}
 
-	public String[] getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(String[] tags) {
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
 
@@ -83,19 +120,15 @@ public class Task {
 		this.description = description;
 	}
 
-	public Subtask[] getSubtasks() {
+	public List<Subtask> getSubtasks() {
 		return subtasks;
 	}
 
-	public void setSubtasks(Subtask[] subtasks) {
+	public void setSubtasks(List<Subtask> subtasks) {
 		this.subtasks = subtasks;
 	}
+
 	
-	
-	@Override
-	public String toString() {
-		return "hey";
-	}
-	
+
 
 }
