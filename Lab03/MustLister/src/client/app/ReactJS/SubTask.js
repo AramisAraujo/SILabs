@@ -3,14 +3,32 @@ let React = require('react');
 let SubTask = React.createClass({
 
 	getInitialState: function() {
-		
+
+		id = this.props.id;
+		checked = this.props.checked;
+		title = this.props.title;
+
 		return({
-			checked:this.props.checked,
-			title:this.props.title,
+			checked: checked,
+			title: title,
 
 		});
 	},
 
+    getStatChecked(id){
+
+	    const url = 'http://localhost:8080/getSTcheck?Id='+id;
+        checked =jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return checked;
+    },
+
+    getStatTitle(id){
+      const url = 'http://localhost:8080/getSTtitle?id='+id;
+      title = jQuery.ajax({ type: "GET", url: url, async: false});
+
+      return title;
+    },
 
 	toggleChecked: function(){
 
@@ -23,13 +41,14 @@ let SubTask = React.createClass({
 	},
 
 	delete: function(){
+        const url = 'http://localhost:8080/delST?id='+ this.state.id;
 
-		this.props.remover(this.state.title);
+        jQuery.ajax({ type: "GET", url: url, async: false});
+
+		this.props.remover(this.state.id);
 
 	},
 	render: function(){
-
-		let title = this.state.title;
 
 	return(<div>
 			<input type="checkbox" checked={this.state.checked} onChange={this.toggleChecked}/>

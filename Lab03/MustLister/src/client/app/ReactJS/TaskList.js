@@ -6,25 +6,40 @@ let TaskList = React.createClass({
 
 	getInitialState: function () {
 
-		let data = this.props.taskData;
+		let id = this.props.id;
+        let title = this.loadTitle(id);
+        let tasks = this.loadTasksList(id);
 
-		if(data == ""){
-			data = [];
-		}
-		let completion = this.getCompletion(data);
+		let completion = this.getCompletion();
 
 		return{
-			id:this.props.id,
-			data: data,
-			title:this.props.title,
-			color: this.props.color,
-			font: "Arial",
+			id: id,
+			title:title,
 			completion: completion,
 			filterTag: "",
 			filterPriority:""
 		};
 	},
 
+    loadTasksList: function (id) {
+
+        const url = 'http://localhost:8080/getTLTasksID?id='+ id;
+
+        let tasksId = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return tasksId;
+
+    },
+
+    loadTitle: function (id) {
+
+        const url = 'http://localhost:8080/getTLTitle?id='+ id;
+
+        let title = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return title;
+
+    },
 
 	handleTaskSubmit: function (title) {
 
@@ -352,7 +367,7 @@ let TaskList = React.createClass({
 		}
 
 		if(taskData == ""){
-			
+
 			taskData = [];
 		}
 

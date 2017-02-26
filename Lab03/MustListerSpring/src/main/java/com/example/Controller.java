@@ -39,34 +39,139 @@ public class Controller {
 	@CrossOrigin
 	@RequestMapping("/testPSQL")
 	public void testCreateList() {
-
+		
 		Subtask subT = new Subtask("Do Something", false);
 		
+		
 		subTaskRepo.save(subT);
-		System.out.println("Subtask Salva!");
+		long id = subT.getId();
 
-		List<Subtask> stList = new ArrayList<Subtask>();
-		stList.add(subT);
-
-		List<String> tags = new ArrayList<String>();
+		System.out.println(id);
+		System.out.println(subTaskRepo.findByid(id).get(0).getTitle());
 		
-		tags.add("Urgente");
-		tags.add("Importante");
-				
-		Task aTask = new Task("", "My first Task", "", false, tags, "low", "a task", stList);
 		
-		taskRepo.save(aTask);
+		return;
+//		Subtask subT = new Subtask("Do Something", false);
+//		
+//		subTaskRepo.save(subT);
+//		System.out.println("Subtask Salva!");
+//
+//		List<Subtask> stList = new ArrayList<Subtask>();
+//		stList.add(subT);
+//
+//		List<String> tags = new ArrayList<String>();
+//		
+//		tags.add("Urgente");
+//		tags.add("Importante");
+//				
+//		Task aTask = new Task("", "My first Task", "", false, tags, "low", "a task", stList);
+//		
+//		taskRepo.save(aTask);
+//		
+//		System.out.println("Task Salva!");
+//
+//		List<Task> taskList = new ArrayList<Task>();
+//
+//		taskList.add(aTask);
+//
+//		taskListRepo.save(new TaskList("My List",taskList));
+//		
+//
+//		System.out.println("Lista criada !");
 		
-		System.out.println("Task Salva!");
-
-		List<Task> taskList = new ArrayList<Task>();
-
-		taskList.add(aTask);
-
-		taskListRepo.save(new TaskList("My List",taskList));
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/getSTTitle")
+	public String getSubtaskTitle(@RequestParam(value = "id") long id){
+		Subtask foundSTask = subTaskRepo.findByid(id).get(0);
 		
-
-		System.out.println("Lista criada !");
+		return foundSTask.getTitle();
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/getTaskColor")
+	public String getTaskColor(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getColor();
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskSTList")
+	public List<Long> getTaskSTList(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		List<Subtask> stList = foundTask.getSubtasks();
+		
+		List<Long> stIds = new ArrayList<Long>();
+		
+		for (Subtask subtask : stList) {
+			
+			stIds.add(subtask.getId());
+		}
+		
+		return stIds;
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskCompletion")
+	public boolean getTaskCompletion(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.isCompleted();
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskTitle")
+	public String getTaskTitle(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getTitle();
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskDesc")
+	public String getTaskDesc(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getDescription();
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskPrio")
+	public String getTaskPriority(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getPriority();
+	}
+	@CrossOrigin
+	@RequestMapping("/getTaskFont")
+	public String getTaskFont(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getFont();
+	}	
+	
+	@CrossOrigin
+	@RequestMapping("/getTaskTags")
+	public List<String> getTaskTags(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		return foundTask.getTags();
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/delTask")
+	public void deleteTask(@RequestParam(value = "id") long id){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		taskRepo.delete(foundTask);
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/changeTaskCompletion")
+	public void changeTaskCompletion(@RequestParam(value = "id") long id,
+			@RequestParam(value = "completed") boolean completed){
+		Task foundTask = taskRepo.findByid(id).get(0);
+		
+		foundTask.setCompleted(completed);
+		
+		taskRepo.save(foundTask);
 		
 	}
 
@@ -76,6 +181,33 @@ public class Controller {
 
 		return readTaskList(id);
 
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/getTLTitle")
+	public String getTaskListTitle(@RequestParam(value = "id") long id){
+		
+		TaskList found = taskListRepo.findByid(id).get(0);
+		
+		return found.getTitle();
+	}
+	
+	@CrossOrigin
+	@RequestMapping("/getTLTasksID")
+	public List<Long> getTLTaskIds(@RequestParam(value = "id") long id){
+		
+		List<Long> taskIds = new ArrayList<Long>();
+		
+		TaskList taskList = taskListRepo.findByid(id).get(0);
+		
+		for (Task task : taskList.getTasks()) {
+			
+			taskIds.add(task.getId());
+			
+		}
+		
+		return taskIds;
+		
 	}
 
 	@CrossOrigin

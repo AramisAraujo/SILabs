@@ -7,17 +7,99 @@ let SubTask = require('./SubTask.js');
 let Task = React.createClass({
 
 	getInitialState: function () {
+        let id = this.props.id;
 
-		return ({color: this.props.color, title: this.props.title,
-		font: "Courier New", id: this.props.taskID, completed: this.props.completed,
-		tags: this.props.tags, priority: this.props.priority,
-		description: this.props.description, subtasks: this.props.subtasks})
+        let tags = this.loadTags(id);
+        let color = this.loadColor(id);
+        let title = this.loadTitle(id);
+        let font = this.loadFont(id);
+        let subtasks = this.loadSubtaskList(id);
+        let completed = this.loadCompletion(id);
+        let description = this.loadDesc(id);
+        let priority = this.loadPriority(id);
+
+		return ({color: color, title: title,
+		font: font, id: id, completed: completed,
+		tags: tags, priority: priority,
+		description: description, subtasks: subtasks})
 	},
+
+    loadTags(id){
+
+	    const url = 'http://localhost:8080/getTaskTags?id='+ id;
+
+        let tags = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return tags;
+    },
+
+    loadColor(id){
+
+        const url = 'http://localhost:8080/getTaskColor?id='+ id;
+
+        let color = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return color;
+    },
+
+    loadTitle(id){
+
+        const url = 'http://localhost:8080/getTaskTitle?id='+ id;
+
+        let title = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return title;
+    },
+
+    loadFont(id){
+
+        const url = 'http://localhost:8080/getTaskFont?id='+ id;
+
+        let font = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return font;
+    },
+    loadSubtaskList(id){
+
+        const url = 'http://localhost:8080/getTaskSTList?id='+ id;
+
+        let subtasks = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return subtasks;
+    },
+    loadCompletion(id){
+
+        const url = 'http://localhost:8080/getTaskCompletion?id='+ id;
+
+        let completion = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return completion;
+    },
+    loadDesc(id){
+
+        const url = 'http://localhost:8080/getTaskDesc?id='+ id;
+
+        let desc = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return desc;
+    },
+    loadPriority(id){
+
+        const url = 'http://localhost:8080/getTaskPrio?id='+ id;
+
+        let priority = jQuery.ajax({ type: "GET", url: url, async: false});
+
+        return priority;
+    },
 
 	removeTask: function(submitEvent) {
 
 		submitEvent.preventDefault();//Overrides default submit event
 		this.props.removeTask(this.state.id);
+
+        const url = 'http://localhost:8080/delTask?id='+ this.state.id;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
 
 	},
 
@@ -32,6 +114,10 @@ let Task = React.createClass({
 		
 		this.props.updateCompletion(this.state.id, completed);
 
+        let url = 'http://localhost:8080/changeTaskCompletion?id='+ this.state.id;
+        url = url +'&completion=' + completed;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
 
 	},
 
