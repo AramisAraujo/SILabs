@@ -22007,225 +22007,209 @@
 	var jQuery = __webpack_require__(/*! jquery */ 421);
 	
 	var TaskBox = React.createClass({
-		displayName: 'TaskBox',
+				displayName: 'TaskBox',
 	
 	
-		getInitialState: function getInitialState() {
+				getInitialState: function getInitialState() {
 	
-			var now = Date.now().toString();
-			var listsData = this.fetchLists();
+							var now = Date.now().toString();
+							var listIds = this.getListsID();
 	
-			return {
+							return {
 	
-				"lastUpdated": now,
-				"listsData": listsData
-			};
-		},
+										"lastUpdated": now,
+										"listIds": listIds
+							};
+				},
 	
-		updateData: function updateData() {
+				updateData: function updateData() {
 	
-			var listsData = this.fetchLists();
-			var completion = this.getCompletion(listsData);
+							var listIds = this.getListsID();
+							var completion = this.getCompletion(listIds);
 	
-			this.setState({ listsData: listsData });
-			this.setState({ completion: completion });
-		},
+							this.setState({ listIds: listIds });
+							this.setState({ completion: completion });
+				},
 	
-		saveLists: function saveLists() {
+				// saveLists: function(){
+				//
+				//     //take a look
+				//
+				// 	let listIds = this.getListsID();
+				//
+				// 	listsIds.map(function (id){
+				// 		saveListId(id);
+				// 	});
+				//
+				//
+				// },
 	
-			var listIds = this.getListsID;
+				getCompletion: function getCompletion(listIds) {
 	
-			listsIds.map(function (id) {
-				saveListId(id);
-			});
-		},
+							var url = 'http://localhost:8080/getCompletionRate';
 	
-		getCompletion: function getCompletion(listsData) {
+							var completion = JSON.parse(jQuery.ajax({ type: "GET", url: url, async: false }).responseText);
 	
-			var completedTasks = 0.0;
-			var taskCount = 0.0;
+							return Math.ceil(completion * 100);
+				},
 	
-			listsData.map(function (listItem) {
+				// saveListId: function(listID, newData){
+				//
+				// 	this.updateData();
+				//
+				// 	let listsData = this.state.listsData;
+				//
+				// 	let listData = listsData.filter(function (listItem){
+				//
+				// 			if(listItem.id == listID){
+				// 				listItem.data = newData;
+				// 				return true;
+				// 			}
+				// 		});
+				//
+				// 	const url = "http://localhost:8080/saveList";
+				//
+				// 	listData = JSON.stringify(listData[0]);
+				//
+				// 	jQuery.ajax({ type: "POST", url: url, data:listData, contentType: "application/json"});
+				//
+				// 	this.updateData();
+				//
+				// },
 	
-				if (listItem.data == []) {
-					return 0;
+				// fetchLists: function(){
+				//
+				//     //get only the ids
+				//
+				// 	let listIds = this.getListsID();
+				//
+				// 	let listsData = [];
+				//
+				// 	listIds.map(function (listID){
+				//
+				// 		let url = "http://localhost:8080/getTaskList?id=" + listID;
+				//
+				// 		let listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+				//
+				// 		listData = JSON.parse(listData);
+				//
+				// 		listsData.push(listData);
+				//
+				// 	})
+				//
+				// 	function compareID(a,b) {
+				// 		return parseInt(a.id) - parseInt(b.id);
+				// 	}
+				//
+				// 	listsData = listsData.sort(compareID);
+				//
+				// 	return listsData;
+				//
+				// },
+	
+				getListsID: function getListsID() {
+	
+							var url = "http://localhost:8080/getListsID";
+	
+							var listIds = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+							return JSON.parse(listIds);
+				},
+	
+				createNewList: function createNewList() {
+	
+							var listTitle = prompt("Insert new TaskList Title", "TaskList Title");
+	
+							// let id = this.generateID();
+	
+							// let stuff = ({"id":id,"title":listTitle,"data":{}});
+	
+							// stuff = JSON.stringify(stuff);
+	
+							var url = "http://localhost:8080/createNewList?title=";
+	
+							url = url + listTitle;
+	
+							jQuery.ajax({ type: "GET", url: url, async: false });
+	
+							// this.setState({lastUpdated:id});
+	
+							this.updateData();
+	
+							this.forceUpdate();
+				},
+	
+				// generateID: function () {
+				//
+				// 	return Date.now().toString();
+				// },
+	
+				renderTaskLists: function renderTaskLists() {
+	
+							var lists = this.getListsID();
+	
+							var renderedLists = lists.map(function (taskListId) {
+	
+										return React.createElement(TaskList, { key: taskListId, id: taskListId,
+													removeList: this.removeTaskList, updateCompletion: this.updateData });
+							}, this);
+	
+							return renderedLists;
+				},
+	
+				removeTaskList: function removeTaskList(listId) {
+	
+							var url = "http://localhost:8080/deleteList?id=" + listId;
+	
+							jQuery.ajax({ type: "GET", url: url, async: false });
+	
+							this.updateData();
+				},
+	
+				render: function render() {
+	
+							return React.createElement(
+										'div',
+										null,
+										React.createElement(
+													'div',
+													{ className: 'myBox' },
+													React.createElement(
+																'h1',
+																null,
+																'This is your MustLister [',
+																this.getCompletion(this.state.listIds),
+																'% Completed]'
+													),
+													this.renderTaskLists(),
+													React.createElement(
+																'button',
+																{ type: 'button', style: { backgroundColor: "gold" }, onClick: this.createNewList },
+																'+'
+													)
+										),
+										React.createElement(
+													'div',
+													{ className: 'myBoxContact' },
+													React.createElement(
+																'h3',
+																null,
+																'Aramis Araujo'
+													),
+													React.createElement(
+																'a',
+																{ href: 'https://github.com/AramisAraujo' },
+																'Find me on Github'
+													),
+													React.createElement('p', null),
+													React.createElement(
+																'a',
+																{ href: 'mailto:aramis.araujo@ccc.ufcg.edu.br' },
+																'Send me an E-mail'
+													)
+										)
+							);
 				}
-	
-				listItem.data.map(function (taskItem) {
-	
-					if (taskItem.completed) {
-	
-						completedTasks += 1;
-					}
-					taskCount += 1;
-				});
-			});
-			var completionRate;
-	
-			if (taskCount == 0) {
-	
-				completionRate = 0;
-			} else {
-				completionRate = completedTasks / taskCount * 100;
-			}
-	
-			return Math.ceil(completionRate);
-		},
-	
-		saveListId: function saveListId(listID, newData) {
-	
-			this.updateData();
-	
-			var listsData = this.state.listsData;
-	
-			var listData = listsData.filter(function (listItem) {
-	
-				if (listItem.id == listID) {
-					listItem.data = newData;
-					return true;
-				}
-			});
-	
-			var url = "http://localhost:8080/saveList";
-	
-			listData = JSON.stringify(listData[0]);
-	
-			jQuery.ajax({ type: "POST", url: url, data: listData, contentType: "application/json" });
-	
-			this.updateData();
-		},
-	
-		fetchLists: function fetchLists() {
-	
-			var listIds = this.getListsID();
-	
-			var listsData = [];
-	
-			listIds.map(function (listID) {
-	
-				var url = "http://localhost:8080/getTaskList?id=" + listID;
-	
-				var listData = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
-	
-				listData = JSON.parse(listData);
-	
-				listsData.push(listData);
-			});
-	
-			function compareID(a, b) {
-				return parseInt(a.id) - parseInt(b.id);
-			}
-	
-			listsData = listsData.sort(compareID);
-	
-			return listsData;
-		},
-	
-		getListsID: function getListsID() {
-	
-			var url = "http://localhost:8080/getListsID";
-	
-			var listIds = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
-	
-			return JSON.parse(listIds);
-		},
-	
-		createNewList: function createNewList() {
-	
-			var listTitle = prompt("Insert new TaskList Title", "TaskList Title");
-	
-			var id = this.generateID();
-	
-			var stuff = { "id": id, "title": listTitle, "data": {} };
-	
-			stuff = JSON.stringify(stuff);
-	
-			var url = "http://localhost:8080/createNewList";
-	
-			jQuery.ajax({ type: "POST", url: url, data: stuff, contentType: "application/json" });
-	
-			this.setState({ lastUpdated: id });
-	
-			this.updateData();
-	
-			this.forceUpdate();
-		},
-	
-		generateID: function generateID() {
-	
-			return Date.now().toString();
-		},
-	
-		renderTaskLists: function renderTaskLists() {
-	
-			var lists = this.fetchLists();
-	
-			var renderedLists = lists.map(function (taskList) {
-	
-				var data = taskList.data;
-	
-				return React.createElement(TaskList, { key: taskList.id, id: taskList.id,
-					taskData: data,
-					title: taskList.title, saveList: this.saveListId, completion: taskList.completion,
-					removeList: this.removeTaskList });
-			}, this);
-	
-			return renderedLists;
-		},
-	
-		removeTaskList: function removeTaskList(listId) {
-	
-			var url = "http://localhost:8080/deleteList?id=" + listId;
-	
-			var listIds = jQuery.ajax({ type: "GET", url: url, async: false });
-	
-			this.updateData();
-		},
-	
-		render: function render() {
-	
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'div',
-					{ className: 'myBox' },
-					React.createElement(
-						'h1',
-						null,
-						'This is your MustLister [',
-						this.getCompletion(this.state.listsData),
-						'% Completed]'
-					),
-					this.renderTaskLists(),
-					React.createElement(
-						'button',
-						{ type: 'button', style: { backgroundColor: "gold" }, onClick: this.createNewList },
-						'+'
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'myBoxContact' },
-					React.createElement(
-						'h3',
-						null,
-						'Aramis Araujo'
-					),
-					React.createElement(
-						'a',
-						{ href: 'https://github.com/AramisAraujo' },
-						'Find me on Github'
-					),
-					React.createElement('p', null),
-					React.createElement(
-						'a',
-						{ href: 'mailto:aramis.araujo@ccc.ufcg.edu.br' },
-						'Send me an E-mail'
-					)
-				)
-			);
-		}
 	});
 	
 	module.exports = TaskBox;
@@ -22244,481 +22228,533 @@
 	var jQuery = __webpack_require__(/*! jquery */ 421);
 	
 	var TaskList = React.createClass({
-		displayName: 'TaskList',
+				displayName: 'TaskList',
 	
 	
-		getInitialState: function getInitialState() {
+				getInitialState: function getInitialState() {
 	
-			var data = this.props.taskData;
+							var id = this.props.id;
+							var title = this.loadTitle(id);
+							var tasks = this.loadTasksList(id);
 	
-			if (data == "") {
-				data = [];
-			}
-			var completion = this.getCompletion(data);
+							var completion = this.getCompletion(tasks);
 	
-			return {
-				id: this.props.id,
-				data: data,
-				title: this.props.title,
-				color: this.props.color,
-				font: "Arial",
-				completion: completion,
-				filterTag: "",
-				filterPriority: ""
-			};
-		},
+							return {
+										id: id,
+										title: title,
+										completion: completion,
+										tasks: tasks,
+										filterTag: "",
+										filterPriority: ""
+							};
+				},
 	
-		handleTaskSubmit: function handleTaskSubmit(title) {
+				loadTasksList: function loadTasksList(id) {
 	
-			var data = this.state.data;
-			var id = this.generateID();
-			var tags = [];
-			var completed = false;
-			var description = "";
-			var priority = "low";
-			var color = "blue";
+							var url = 'http://localhost:8080/getTLTasksID?id=' + id;
 	
-			if (data == []) {
-				data = data.concat([{ id: id, title: title, completed: completed, tags: tags, description: description, priority: priority, color: color }]);
-			} else {
+							var tasksId = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
 	
-				data = data.concat([{ id: id, title: title, completed: completed, tags: tags, description: description, priority: priority, color: color }]);
-			}
+							return JSON.parse(tasksId);
+				},
 	
-			this.setState({ data: data });
+				loadTitle: function loadTitle(id) {
 	
-			this.updateCompletion(data);
+							var url = 'http://localhost:8080/getTLTitle?id=' + id;
 	
-			this.props.saveList(this.state.id, data);
-		},
+							var title = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
 	
-		handleTaskRemoval: function handleTaskRemoval(taskID) {
+							return title;
+				},
 	
-			var taskData = this.state.data;
+				handleTaskSubmit: function handleTaskSubmit(title) {
 	
-			taskData = taskData.filter(function (element) {
-				return element.id !== taskID;
-			});
+							var url = 'http://localhost:8080/createTask?title=' + title;
 	
-			this.setState({ data: taskData });
+							url = url + '&listId=' + this.state.id;
 	
-			this.updateCompletion(taskData);
+							var taskId = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
 	
-			this.props.saveList(this.state.id, taskData);
-		},
+							taskId = JSON.parse(taskId);
 	
-		generateID: function generateID() {
+							var tasks = this.state.tasks;
 	
-			return Date.now().toString();
-		},
+							tasks = tasks.concat(taskId);
 	
-		updateCompletion: function updateCompletion(taskData) {
+							this.updateCompletion(tasks);
 	
-			var completionRate = this.getCompletion(taskData);
+							this.setState({ tasks: tasks });
+				},
 	
-			this.setState({ completion: completionRate });
+				handleTaskRemoval: function handleTaskRemoval(taskID) {
 	
-			this.props.saveList(this.state.id, taskData);
-		},
+							var tasks = this.state.tasks;
 	
-		getCompletion: function getCompletion(taskData) {
+							tasks = tasks.filter(function (id) {
+										return id !== taskID;
+							});
 	
-			var completedTasks = 0.0;
-			var taskCount = 0.0;
+							var url = 'http://localhost:8080/removeTask?id=' + this.state.id;
 	
-			if (taskData = []) {
-				return 0;
-			}
+							url = url + '&taskId=' + taskID;
 	
-			taskData.map(function (taskItem) {
+							jQuery.ajax({ type: "GET", url: url, async: false });
 	
-				if (taskItem.completed) {
+							this.updateCompletion();
 	
-					completedTasks += 1;
+							this.props.updateCompletion();
+	
+							this.setState({ tasks: tasks });
+				},
+	
+				updateCompletion: function updateCompletion() {
+	
+							var tasks = this.loadTasksList(this.state.id);
+	
+							var completionRate = this.getCompletion(tasks);
+	
+							this.props.updateCompletion();
+	
+							this.setState({ completion: completionRate });
+				},
+	
+				getCompletion: function getCompletion(taskIdList) {
+	
+							var completedTasks = 0.0;
+							var taskCount = 0.0;
+	
+							if (taskIdList === []) {
+										return 0;
+							}
+	
+							taskIdList.map(function (taskId) {
+	
+										var url = 'http://localhost:8080/getTaskCompletion?id=' + taskId;
+	
+										var completed = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+										completed = JSON.parse(completed);
+	
+										if (completed) {
+	
+													completedTasks += 1;
+										}
+										taskCount += 1;
+							}, this);
+	
+							var completionRate = void 0;
+	
+							if (taskCount == 0) {
+	
+										completionRate = 0;
+							} else {
+										completionRate = completedTasks / taskCount * 100;
+							}
+	
+							return Math.ceil(completionRate);
+				},
+	
+				// handleTaskCompletion: function(taskID, taskIsCompleted) {
+				//
+				// 	this.state.data.map(function (taskItem) {
+				//
+				// 		if(taskItem.id == taskID){
+				//
+				// 			taskItem.completed = taskIsCompleted;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	let newData = this.state.data;
+				//
+				// 	this.updateCompletion(newData);
+				//
+				// },
+				//
+				// handleTaskDescUpdate: function(taskID, newDescription) {
+				//
+				// 	let data = this.state.data;
+				//
+				// 	data.map(function (taskItem) {
+				//
+				// 		if(taskItem.id == taskID){
+				//
+				// 			taskItem.description = newDescription;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	this.props.saveList(this.state.id, data);
+				//
+				// },
+				// handleTaskTagUpdate: function(taskID, newTags) {
+				//
+				// 	let data = this.state.data;
+				// 	data.map(function (taskItem) {
+				//
+				// 		if(taskItem.id == taskID){
+				//
+				// 			taskItem.tags = newTags;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	this.props.saveList(this.state.id, data);
+				//
+				// },
+				//
+				// handleTaskSubUpdate: function(taskID,subtaskData){
+				//
+				// 	let data = this.state.data;
+				//
+				// 	data.map(function (taskItem) {
+				//
+				// 		if(taskItem.id == taskID){
+				// 			taskItem.subtasks = subtaskData;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	this.props.saveList(this.state.id, data);
+				//
+				// },
+				//
+				// handleTaskPrioUpdate: function(taskID,newPriority){
+				//
+				// 	let data = this.state.data;
+				//
+				// 	data.map(function (taskItem) {
+				//
+				// 	if(taskItem.id == taskID){
+				//
+				// 		taskItem.priority = newPriority;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	this.props.saveList(this.state.id, data);
+				//
+				// },
+	
+	
+				sortTaskPriority: function sortTaskPriority() {
+	
+							var sortedTasks = this.getHighPriorityTasks();
+	
+							sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
+	
+							this.setState({ tasks: sortedTasks });
+				},
+	
+				getLowPriorityTasks: function getLowPriorityTasks() {
+	
+							var tasksList = this.state.tasks;
+	
+							var lowTasks = tasksList.filter(function (taskId) {
+	
+										var url = 'http://localhost:8080/getTaskPrio?id=' + taskId;
+	
+										var priority = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+										return priority == "low";
+							});
+	
+							return lowTasks;
+				},
+	
+				getMedPriorityTasks: function getMedPriorityTasks() {
+	
+							var tasksList = this.state.tasks;
+	
+							var medTasks = tasksList.filter(function (taskId) {
+	
+										var url = 'http://localhost:8080/getTaskPrio?id=' + taskId;
+	
+										var priority = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+										return priority == "medium";
+							});
+	
+							return medTasks;
+				},
+	
+				getHighPriorityTasks: function getHighPriorityTasks() {
+	
+							var tasksList = this.state.tasks;
+	
+							var highTasks = tasksList.filter(function (taskId) {
+	
+										var url = 'http://localhost:8080/getTaskPrio?id=' + taskId;
+	
+										var priority = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+										return priority == "high";
+							});
+	
+							return highTasks;
+				},
+	
+				sortTaskTitle: function sortTaskTitle() {
+	
+							function compareTitle(a, b) {
+										if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
+										if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+										return 0;
+							}
+	
+							var taskIds = this.state.tasks;
+	
+							var tasksTitleAndId = [];
+	
+							taskIds.map(function (id) {
+										var url = 'http://localhost:8080/getTaskTitle?id=' + id;
+	
+										var title = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+										tasksTitleAndId = tasksTitleAndId.concat([[id, title]]);
+							});
+	
+							var sortTasks = tasksTitleAndId.sort(compareTitle);
+	
+							var sorted = [];
+	
+							sortTasks.map(function (item) {
+	
+										sorted = sorted.concat(item[0]);
+							});
+	
+							this.setState({ tasks: sorted });
+				},
+	
+				filterByPriority: function filterByPriority(priority) {
+	
+							var priorities = ["low", "medium", "high"];
+	
+							priority = priority.toLowerCase().trim();
+	
+							if (priorities.includes(priority)) {
+	
+										this.setState({ filterPriority: priority });
+							} else if (priority == "" && this.state.filterPriority != "") {
+										this.setState({ filterPriority: "" });
+							}
+				},
+	
+				filterByTag: function filterByTag(reset) {
+	
+							var tag = void 0;
+							if (reset == true) {
+										tag = "";
+							} else {
+	
+										tag = prompt("Input a single tag for filtering", "#MyTag");
+							}
+	
+							tag = tag.toLowerCase().trim();
+	
+							this.setState({ filterTag: tag });
+				},
+	
+				setTitle: function setTitle(newTitle) {
+	
+							newTitle = newTitle.trim();
+	
+							if (newTitle != "") {
+										var url = 'http://localhost:8080/changeTLTitle?id=' + id;
+	
+										url = url + '&title=' + newTitle;
+										jQuery.ajax({ type: "GET", url: url, async: false });
+	
+										this.setState({ title: newTitle });
+							}
+				},
+	
+				// handleColorChange: function(taskID, newColor){
+				//
+				// 	let data = this.state.data;
+				//
+				// 	data.map(function (taskItem) {
+				//
+				// 	if(taskItem.id == taskID){
+				//
+				// 		taskItem.color = newColor;
+				// 		}
+				//
+				// 	}, this);
+				//
+				// 	this.props.saveList(this.state.id, data);
+				//
+				// },
+	
+				renderTasks: function renderTasks(taskIdList) {
+	
+							var prio = this.state.filterPriority;
+							var tagFilter = this.state.filterTag;
+	
+							if (prio != "") {
+										taskIdList = taskIdList.filter(function (taskId) {
+	
+													var url = 'http://localhost:8080/getTaskPrio?id=' + taskId;
+	
+													var priority = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+													return priority == prio;
+										});
+							}
+	
+							if (tagFilter != "") {
+										taskIdList = taskIdList.filter(function (taskId) {
+	
+													var url = 'http://localhost:8080/getTaskTags?id=' + taskId;
+	
+													var tags = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+													return tags.includes(tagFilter);
+										});
+							}
+	
+							var taskListing = taskIdList.map(function (taskId) {
+	
+										return React.createElement(
+													'li',
+													{ key: taskId },
+													React.createElement(Task, { key: taskId, taskID: taskId, remover: this.handleTaskRemoval,
+																updateCompletion: this.updateCompletion })
+										);
+							}, this);
+	
+							return taskListing;
+				},
+	
+				removeList: function removeList() {
+	
+							this.props.removeList(this.state.id);
+				},
+	
+				render: function render() {
+	
+							var tasks = void 0;
+							if (this.state.tasks.length > 0) {
+	
+										tasks = this.renderTasks(this.state.tasks);
+							} else {
+										tasks = "";
+							}
+	
+							return React.createElement(
+										'ul',
+										{ key: this.state.id, className: 'myBoxList', onClick: this.handleClick },
+										React.createElement(
+													'h1',
+													null,
+													this.state.title
+										),
+										React.createElement(
+													'h1',
+													null,
+													'Completion rate: ',
+													this.state.completion,
+													' %'
+										),
+										tasks,
+										React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit }),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "gold" }, onClick: this.sortTaskPriority },
+													'Sort Priority'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "silver" }, onClick: this.sortTaskTitle },
+													'Sort Title'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "High") },
+													'Filter High'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Medium") },
+													'Filter Medium'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Low") },
+													'Filter Low'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "aqua" }, onClick: this.filterByTag },
+													'Filter by Tag'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByPriority.bind(this, "") },
+													'Reset Priority Filter'
+										),
+										React.createElement(
+													'button',
+													{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByTag.bind(this, true) },
+													'Reset Tag Filter'
+										),
+										React.createElement(
+													'a',
+													{ type: 'button', className: 'close-ribbon', onClick: this.removeList },
+													'\xD7'
+										)
+							);
 				}
-				taskCount += 1;
-			}, this);
-	
-			var completionRate;
-	
-			if (taskCount == 0) {
-	
-				completionRate = 0;
-			} else {
-				completionRate = completedTasks / taskCount * 100;
-			}
-	
-			return Math.ceil(completionRate);
-		},
-	
-		handleTaskCompletion: function handleTaskCompletion(taskID, taskIsCompleted) {
-	
-			this.state.data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-	
-					taskItem.completed = taskIsCompleted;
-				}
-			}, this);
-	
-			var newData = this.state.data;
-	
-			this.updateCompletion(newData);
-		},
-	
-		handleTaskDescUpdate: function handleTaskDescUpdate(taskID, newDescription) {
-	
-			var data = this.state.data;
-	
-			data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-	
-					taskItem.description = newDescription;
-				}
-			}, this);
-	
-			this.props.saveList(this.state.id, data);
-		},
-		handleTaskTagUpdate: function handleTaskTagUpdate(taskID, newTags) {
-	
-			var data = this.state.data;
-			data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-	
-					taskItem.tags = newTags;
-				}
-			}, this);
-	
-			this.props.saveList(this.state.id, data);
-		},
-	
-		handleTaskSubUpdate: function handleTaskSubUpdate(taskID, subtaskData) {
-	
-			var data = this.state.data;
-	
-			data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-					taskItem.subtasks = subtaskData;
-				}
-			}, this);
-	
-			this.props.saveList(this.state.id, data);
-		},
-	
-		handleTaskPrioUpdate: function handleTaskPrioUpdate(taskID, newPriority) {
-	
-			var data = this.state.data;
-	
-			data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-	
-					taskItem.priority = newPriority;
-				}
-			}, this);
-	
-			this.props.saveList(this.state.id, data);
-		},
-	
-		sortTaskPriority: function sortTaskPriority() {
-	
-			var sortedTasks = this.getHighPriorityTasks();
-	
-			sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
-	
-			this.setState({ data: sortedTasks });
-	
-			return;
-		},
-	
-		getLowPriorityTasks: function getLowPriorityTasks() {
-	
-			var taskData = this.state.data;
-	
-			var lowTasks = taskData.filter(function (taskItem) {
-				return taskItem.priority == "low";
-			});
-	
-			return lowTasks;
-		},
-	
-		getMedPriorityTasks: function getMedPriorityTasks() {
-	
-			var taskData = this.state.data;
-	
-			var medTasks = taskData.filter(function (taskItem) {
-				return taskItem.priority == "medium";
-			});
-	
-			return medTasks;
-		},
-	
-		getHighPriorityTasks: function getHighPriorityTasks() {
-	
-			var taskData = this.state.data;
-	
-			var highTasks = taskData.filter(function (taskItem) {
-				return taskItem.priority == "high";
-			});
-	
-			return highTasks;
-		},
-	
-		sortTaskTitle: function sortTaskTitle() {
-	
-			function compareTitle(a, b) {
-				if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-				if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
-				return 0;
-			}
-	
-			var sortedTasks = this.state.data.sort(compareTitle);
-	
-			this.setState({ data: sortedTasks });
-	
-			return;
-		},
-	
-		filterByPriority: function filterByPriority(priority) {
-	
-			var priorities = ["low", "medium", "high"];
-	
-			priority = priority.toLowerCase().trim();
-	
-			var filteredTasks;
-	
-			if (priorities.includes(priority)) {
-	
-				this.setState({ filterPriority: priority });
-			} else if (priority == "" && this.state.filterPriority != "") {
-				this.setState({ filterPriority: "" });
-			}
-	
-			return;
-		},
-	
-		filterByTag: function filterByTag(reset) {
-	
-			var tag;
-			if (reset == true) {
-				tag = "";
-			} else {
-	
-				tag = prompt("Input a single tag for filtering", "#MyTag");
-			}
-	
-			tag = tag.toLowerCase().trim();
-	
-			this.setState({ filterTag: tag });
-	
-			return;
-		},
-	
-		setTitle: function setTitle(newTitle) {
-	
-			newTitle = newTitle.trim();
-	
-			if (newTitle != "") {
-				this.setState({ title: newTitle });
-			}
-	
-			this.props.saveList(this.state.id, this.state.data);
-		},
-	
-		handleColorChange: function handleColorChange(taskID, newColor) {
-	
-			var data = this.state.data;
-	
-			data.map(function (taskItem) {
-	
-				if (taskItem.id == taskID) {
-	
-					taskItem.color = newColor;
-				}
-			}, this);
-	
-			this.props.saveList(this.state.id, data);
-		},
-	
-		renderTasks: function renderTasks(taskData) {
-	
-			var prio = this.state.filterPriority;
-			var tagFilter = this.state.filterTag;
-	
-			if (prio != "") {
-				taskData = taskData.filter(function (taskItem) {
-					return taskItem.priority == prio;
-				});
-			}
-	
-			if (tagFilter != "") {
-				taskData = taskData.filter(function (taskItem) {
-					var tags = taskItem.tags;
-					return tags.includes(tagFilter);
-				});
-			}
-	
-			if (taskData == "") {
-	
-				taskData = [];
-			}
-	
-			var listTasks = taskData.map(function (taskItem) {
-	
-				return React.createElement(
-					'li',
-					{ key: taskItem.id },
-					React.createElement(Task, { key: taskItem.id, taskID: taskItem.id, title: taskItem.title,
-						completed: taskItem.completed, tags: taskItem.tags, removeTask: this.handleTaskRemoval,
-						font: this.props.font, updateCompletion: this.handleTaskCompletion,
-						description: taskItem.description,
-						priority: taskItem.priority,
-						subtasks: taskItem.subtasks,
-						updateDesc: this.handleTaskDescUpdate,
-						updateSTask: this.handleTaskSubUpdate,
-						changePrio: this.handleTaskPrioUpdate,
-						color: taskItem.color,
-						changeColor: this.handleColorChange,
-						updateTagTask: this.handleTaskTagUpdate
-					})
-				);
-			}, this);
-	
-			return listTasks;
-		},
-	
-		removeList: function removeList() {
-	
-			this.props.removeList(this.state.id);
-		},
-	
-		render: function render() {
-	
-			var tasks;
-			if (this.state.data != []) {
-	
-				tasks = this.renderTasks(this.state.data);
-			} else {
-				tasks = "";
-			}
-	
-			return React.createElement(
-				'ul',
-				{ key: this.state.id, className: 'myBoxList', onClick: this.handleClick },
-				React.createElement(
-					'h1',
-					null,
-					this.state.title
-				),
-				React.createElement(
-					'h1',
-					null,
-					'Completion rate: ',
-					this.state.completion,
-					' %'
-				),
-				tasks,
-				React.createElement(TaskSubmitter, { onTaskSubmit: this.handleTaskSubmit }),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "gold" }, onClick: this.sortTaskPriority },
-					'Sort Priority'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "silver" }, onClick: this.sortTaskTitle },
-					'Sort Title'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "High") },
-					'Filter High'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Medium") },
-					'Filter Medium'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "pink" }, onClick: this.filterByPriority.bind(this, "Low") },
-					'Filter Low'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "aqua" }, onClick: this.filterByTag },
-					'Filter by Tag'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByPriority.bind(this, "") },
-					'Reset Priority Filter'
-				),
-				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "turquoise" }, onClick: this.filterByTag.bind(this, true) },
-					'Reset Tag Filter'
-				),
-				React.createElement(
-					'a',
-					{ type: 'button', className: 'close-ribbon', onClick: this.removeList },
-					'\xD7'
-				)
-			);
-		}
 	
 	});
 	
 	var TaskSubmitter = React.createClass({
-		displayName: 'TaskSubmitter',
+				displayName: 'TaskSubmitter',
 	
 	
-		doSubmit: function doSubmit(submitEvent) {
+				doSubmit: function doSubmit(submitEvent) {
 	
-			submitEvent.preventDefault(); //Overrides default submit event
+							submitEvent.preventDefault(); //Overrides default submit event
 	
-			var taskTitle = this.refs.task.value.trim();
+							var taskTitle = this.refs.task.value.trim();
 	
-			if (taskTitle == "") {
+							if (taskTitle == "") {
 	
-				return;
-			}
+										return;
+							}
 	
-			this.props.onTaskSubmit(taskTitle);
+							this.props.onTaskSubmit(taskTitle);
 	
-			this.refs.task.value = "";
+							this.refs.task.value = "";
 	
-			return;
-		},
+							return;
+				},
 	
-		render: function render() {
-			return React.createElement(
-				'div',
-				{ className: 'myBoxInput' },
-				React.createElement(
-					'form',
-					{ onSubmit: this.doSubmit },
-					React.createElement(
-						'div',
-						{ className: 'ribbon round' },
-						React.createElement(
-							'h3',
-							null,
-							'Tell me what you must:'
-						)
-					),
-					React.createElement('input', { className: 'input-text', type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' }),
-					React.createElement(
-						'div',
-						null,
-						React.createElement('input', { type: 'submit', value: 'Save Task' })
-					)
-				)
-			);
-		}
+				render: function render() {
+							return React.createElement(
+										'div',
+										{ className: 'myBoxInput' },
+										React.createElement(
+													'form',
+													{ onSubmit: this.doSubmit },
+													React.createElement(
+																'div',
+																{ className: 'ribbon round' },
+																React.createElement(
+																			'h3',
+																			null,
+																			'Tell me what you must:'
+																)
+													),
+													React.createElement('input', { className: 'input-text', type: 'text', id: 'task', ref: 'task', placeholder: 'I have to...' }),
+													React.createElement(
+																'div',
+																null,
+																React.createElement('input', { type: 'submit', value: 'Save Task' })
+													)
+										)
+							);
+				}
 	
 	});
 	
@@ -22733,33 +22769,105 @@
 
 	'use strict';
 	
-	var _React$createClass;
-	
 	var _reactColor = __webpack_require__(/*! react-color */ 181);
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	var React = __webpack_require__(/*! react */ 1);
 	var FontPicker = __webpack_require__(/*! react-font-picker */ 419);
 	var SubTask = __webpack_require__(/*! ./SubTask.js */ 420);
+	var jQuery = __webpack_require__(/*! jquery */ 421);
 	
-	var Task = React.createClass((_React$createClass = {
+	var Task = React.createClass({
 		displayName: 'Task',
 	
 	
 		getInitialState: function getInitialState() {
+			var id = this.props.taskID;
 	
-			return { color: this.props.color, title: this.props.title,
-				font: "Courier New", id: this.props.taskID, completed: this.props.completed,
-				tags: this.props.tags, priority: this.props.priority,
-				description: this.props.description, subtasks: this.props.subtasks };
+			var tags = this.loadTags(id);
+			var color = this.loadColor(id);
+			var title = this.loadTitle(id);
+			var font = this.loadFont(id);
+			var subtasks = this.loadSubtaskList(id);
+			var completed = this.loadCompletion(id);
+			var description = this.loadDesc(id);
+			var priority = this.loadPriority(id);
+	
+			return { color: color, title: title,
+				font: font, id: id, completed: completed,
+				tags: tags, priority: priority,
+				description: description, subtasks: subtasks };
 		},
+	
+		loadTags: function loadTags(id) {
+	
+			var url = 'http://localhost:8080/getTaskTags?id=' + id;
+	
+			var tags = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return JSON.parse(tags);
+		},
+		loadColor: function loadColor(id) {
+	
+			var url = 'http://localhost:8080/getTaskColor?id=' + id;
+	
+			var color = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return color;
+		},
+		loadTitle: function loadTitle(id) {
+	
+			var url = 'http://localhost:8080/getTaskTitle?id=' + id;
+	
+			var title = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return title;
+		},
+		loadFont: function loadFont(id) {
+	
+			var url = 'http://localhost:8080/getTaskFont?id=' + id;
+	
+			var font = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return font;
+		},
+		loadSubtaskList: function loadSubtaskList(id) {
+	
+			var url = 'http://localhost:8080/getTaskSTList?id=' + id;
+	
+			var subtasks = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return JSON.parse(subtasks);
+		},
+		loadCompletion: function loadCompletion(id) {
+	
+			var url = 'http://localhost:8080/getTaskCompletion?id=' + id;
+	
+			var completion = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return JSON.parse(completion);
+		},
+		loadDesc: function loadDesc(id) {
+	
+			var url = 'http://localhost:8080/getTaskDesc?id=' + id;
+	
+			var desc = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return desc;
+		},
+		loadPriority: function loadPriority(id) {
+	
+			var url = 'http://localhost:8080/getTaskPrio?id=' + id;
+	
+			var priority = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return priority;
+		},
+	
 	
 		removeTask: function removeTask(submitEvent) {
 	
 			submitEvent.preventDefault(); //Overrides default submit event
-			this.props.removeTask(this.state.id);
-			return;
+			this.props.remover(this.state.id);
 		},
 	
 		toggleComplete: function toggleComplete(toggleEvent) {
@@ -22768,23 +22876,33 @@
 	
 			var completed = this.state.completed === true ? false : true;
 	
+			var url = 'http://localhost:8080/changeTaskCompletion?id=' + this.state.id;
+	
+			url = url + '&completed=' + completed;
+			jQuery.ajax({ type: "GET", url: url, async: false });
+	
+			this.props.updateCompletion();
 			this.setState({ completed: completed });
-	
-			this.props.updateCompletion(this.state.id, completed);
-	
-			return;
 		},
 	
 		changeColor: function changeColor(newColor) {
 	
 			this.setState({ color: newColor.hex });
-			return;
+	
+			var url = 'http://localhost:8080/changeTaskColor?id=' + this.state.id;
+			url = url + '&color=' + newColor.hex;
+	
+			jQuery.ajax({ type: "GET", url: url, async: false });
 		},
 	
 		changeFont: function changeFont(newFont) {
 	
 			this.setState({ font: newFont });
-			return;
+	
+			var url = 'http://localhost:8080/changeTaskFont?id=' + this.state.id;
+			url = url + '&font=' + newFont;
+	
+			jQuery.ajax({ type: "GET", url: url, async: false });
 		},
 	
 		addTag: function addTag() {
@@ -22799,23 +22917,13 @@
 	
 				this.setState({ tags: tags });
 	
-				this.props.updateTagTask(this.state.id, tags);
+				// this.props.updateTagTask(this.state.id, tags);
+	
+				var url = 'http://localhost:8080/addTaskTag?id=' + this.state.id;
+				url = url + '&tag=' + tagTitle;
+	
+				jQuery.ajax({ type: "GET", url: url, async: false });
 			}
-	
-			return;
-		},
-	
-		removeTag: function removeTag(aTag) {
-	
-			var tagData = this.state.tags;
-	
-			tagData = tagData.filter(function (tagElement) {
-				return tagElement !== aTag;
-			});
-	
-			this.setState({ tags: tagData });
-	
-			return;
 		},
 	
 		setPriority: function setPriority(newPriority) {
@@ -22828,17 +22936,18 @@
 	
 				var color = this.getPriorityColor(newPriority);
 	
-				this.setState({ priority: newPriority, color: color });
-				this.props.changePrio(this.state.id, newPriority);
-				this.props.changeColor(this.state.id, color);
-			}
+				var url = 'http://localhost:8080/changeTaskPrio?id=' + this.state.id;
+				url = url + '&prio=' + newPriority;
 	
-			this.forceUpdate();
+				jQuery.ajax({ type: "GET", url: url, async: false });
+	
+				this.setState({ priority: newPriority, color: color });
+			}
 		},
 	
 		togglePriority: function togglePriority() {
 	
-			var newPriority;
+			var newPriority = void 0;
 			var actualPriority = this.state.priority;
 	
 			if (actualPriority == "low") {
@@ -22862,33 +22971,43 @@
 	
 				this.setState({ description: description });
 				this.refs.description.value = description;
-				this.props.updateDesc(this.state.id, description);
-			}
+				// this.props.updateDesc(this.state.id, description);
 	
-			return;
+				var url = 'http://localhost:8080/changeTaskDesc?id=' + this.state.id;
+				url = url + '&desc=' + description;
+	
+				jQuery.ajax({ type: "GET", url: url, async: false });
+			}
 		},
 	
 		addSubtask: function addSubtask() {
 	
 			var title = prompt("Insert new SubTask Title:", "SubTask Title");
-			var checked = false;
 	
-			var subtaskData = this.state.subtasks.concat([{ title: title, checked: checked }]);
+			var url = 'http://localhost:8080/createST?title=' + title;
 	
-			this.setState({ subtasks: subtaskData });
+			url = url + '&taskId=' + this.state.id;
 	
-			this.props.updateSTask(this.state.id, subtaskData);
+			var stId = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			var subtasksIdList = this.state.subtasks;
+	
+			subtasksIdList = subtasksIdList.concat(stId);
+	
+			this.setState({ subtasks: subtasksIdList });
 		},
 	
-		removeSubtask: function removeSubtask(subtaskTitle) {
+		removeSubtask: function removeSubtask(subtaskID) {
 	
-			var subtasks = this.state.subtasks.filter(function (subTask) {
-				return subTask.title != subtaskTitle;
+			var subtasks = this.state.subtasks.filter(function (id) {
+				return id != subtaskID;
 			});
 	
-			this.setState({ subtasks: subtasks });
+			var url = 'http://localhost:8080/delST?id=' + subtaskID;
 	
-			this.props.updateSTask(this.state.id, subtasks);
+			jQuery.ajax({ type: "GET", url: url, async: false });
+	
+			this.setState({ subtasks: subtasks });
 		},
 	
 		renderSubtasks: function renderSubtasks() {
@@ -22897,34 +23016,24 @@
 				return;
 			}
 	
-			var subtasks = this.state.subtasks.map(function (staskItem) {
-				var id = this.generateID();
+			var urlGetTitle = 'http://localhost:8080/getSTTitle?id=';
+			var urlGetChecked = 'http://localhost:8080/getSTChecked?id=';
 	
-				return React.createElement(SubTask, { key: id, title: staskItem.title,
-					checked: staskItem.checked, update: this.handleSubUpdate,
-					remover: this.removeSubtask
-				});
+			var subtasksToRender = this.state.subtasks.map(function (subtaskID) {
+	
+				var urlTitle = urlGetTitle + subtaskID;
+				var urlChecked = urlGetChecked + subtaskID;
+	
+				var checked = jQuery.ajax({ type: "GET", url: urlChecked, async: false }).responseText;
+	
+				checked = JSON.parse(checked);
+	
+				var title = jQuery.ajax({ type: "GET", url: urlTitle, async: false }).responseText;
+	
+				return React.createElement(SubTask, { key: subtaskID, id: subtaskID, remover: this.removeSubtask });
 			}, this);
 	
-			return subtasks;
-		},
-	
-		generateID: function generateID() {
-	
-			return Date.now().toString();
-		},
-	
-		handleSubUpdate: function handleSubUpdate(title, checked) {
-	
-			var subtasks = this.state.subtasks;
-	
-			subtasks.map(function (subTask) {
-				if (subTask.title == title) {
-					subTask.checked = checked;
-				}
-			});
-	
-			this.props.updateSTask(this.state.id, subtasks);
+			return subtasksToRender;
 		},
 	
 		getPriorityColor: function getPriorityColor(priority) {
@@ -22936,85 +23045,92 @@
 			} else {
 				return "red";
 			}
-		}
+		},
 	
-	}, _defineProperty(_React$createClass, 'removeTag', function removeTag() {
-		var tagToRemove = prompt("Input tag for removal", "Tag to Remove");
-		var tags = this.state.tags;
+		removeTag: function removeTag() {
+			var tagToRemove = prompt("Input tag for removal", "Tag to Remove");
+			var tags = this.state.tags;
 	
-		tags = tags.filter(function (tagTitle) {
+			tags = tags.filter(function (tagTitle) {
 	
-			return tagTitle != tagToRemove.toLowerCase();
-		});
+				return tagTitle != tagToRemove.toLowerCase();
+			});
 	
-		this.setState({ tags: tags });
+			var url = 'http://localhost:8080/delTaskTag?id=' + this.state.id;
 	
-		this.props.updateTagTask(this.state.id, tags);
-	}), _defineProperty(_React$createClass, 'render', function render() {
+			url = url + '&tag=' + tagToRemove.toLowerCase();
+			jQuery.ajax({ type: "GET", url: url, async: false });
 	
-		var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
+			this.setState({ tags: tags });
+		},
 	
-		if (this.state.completed == true) {
+		render: function render() {
 	
-			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
-		}
+			var style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "transparent" };
 	
-		return React.createElement(
-			'div',
-			{ className: 'myBoxTask', onDoubleClick: this.togglePriority },
-			React.createElement(
-				'h2',
-				{ style: style },
-				this.props.title
-			),
-			React.createElement(
+			if (this.state.completed == true) {
+	
+				style = { color: this.state.color, fontFamily: this.state.font, backgroundColor: "gold" };
+			}
+	
+			return React.createElement(
 				'div',
-				null,
-				React.createElement('input', { className: 'descBox', type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
-			),
-			React.createElement(
-				'button',
-				{ type: 'button', style: { backgroundColor: "limegreen" },
-					onClick: this.toggleComplete },
-				'\u2713'
-			),
-			React.createElement(
-				'a',
-				{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
-				'\xD7'
-			),
-			React.createElement(
-				'div',
-				null,
-				'Subtasks:',
-				this.renderSubtasks(),
+				{ className: 'myBoxTask', onDoubleClick: this.togglePriority },
 				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "orange" },
-						onClick: this.addSubtask },
-					'+'
-				)
-			),
-			React.createElement(
-				'div',
-				null,
-				'Tags:',
-				this.state.tags.toString(),
+					'h2',
+					{ style: style },
+					this.state.title
+				),
 				React.createElement(
-					'button',
-					{ type: 'button', style: { backgroundColor: "violet" },
-						onClick: this.addTag },
-					'+'
+					'div',
+					null,
+					React.createElement('input', { className: 'descBox', type: 'text', placeholder: this.state.description, onBlur: this.setDescription, ref: 'description' })
 				),
 				React.createElement(
 					'button',
-					{ type: 'button', style: { backgroundColor: "#737CEE" },
-						onClick: this.removeTag },
-					'Remove Tag'
+					{ type: 'button', style: { backgroundColor: "limegreen" },
+						onClick: this.toggleComplete },
+					'\u2713'
+				),
+				React.createElement(
+					'a',
+					{ type: 'button', className: 'close-ribbon', onClick: this.removeTask },
+					'\xD7'
+				),
+				React.createElement(
+					'div',
+					null,
+					'Subtasks:',
+					this.renderSubtasks(),
+					React.createElement(
+						'button',
+						{ type: 'button', style: { backgroundColor: "orange" },
+							onClick: this.addSubtask },
+						'+'
+					)
+				),
+				React.createElement(
+					'div',
+					null,
+					'Tags:',
+					this.state.tags.toString(),
+					React.createElement(
+						'button',
+						{ type: 'button', style: { backgroundColor: "violet" },
+							onClick: this.addTag },
+						'+'
+					),
+					React.createElement(
+						'button',
+						{ type: 'button', style: { backgroundColor: "#737CEE" },
+							onClick: this.removeTag },
+						'Remove Tag'
+					)
 				)
-			)
-		);
-	}), _React$createClass));
+			);
+		}
+	
+	});
 	
 	module.exports = Task;
 
@@ -36873,53 +36989,79 @@
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	var React = __webpack_require__(/*! react */ 1);
+	var jQuery = __webpack_require__(/*! jquery */ 421);
 	
 	var SubTask = React.createClass({
-		displayName: "SubTask",
+		displayName: 'SubTask',
 	
 	
 		getInitialState: function getInitialState() {
 	
+			var id = this.props.id;
+			var checked = this.getStatChecked(id);
+			var title = this.getStatTitle(id);
+	
 			return {
-				checked: this.props.checked,
-				title: this.props.title
+				id: id,
+				checked: checked,
+				title: title
 	
 			};
 		},
+	
+		getStatChecked: function getStatChecked(id) {
+	
+			var url = 'http://localhost:8080/getSTChecked?id=' + id;
+	
+			var checked = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return JSON.parse(checked);
+		},
+		getStatTitle: function getStatTitle(id) {
+			var url = 'http://localhost:8080/getSTTitle?id=' + id;
+			var title = jQuery.ajax({ type: "GET", url: url, async: false }).responseText;
+	
+			return title;
+		},
+	
 	
 		toggleChecked: function toggleChecked() {
 	
 			var isChecked = this.state.checked === true ? false : true;
 	
+			var url = 'http://localhost:8080/changeSTChecked?id=' + this.state.id;
+	
+			url = url + '&checked=' + isChecked;
+	
+			jQuery.ajax({ type: "GET", url: url, async: false });
+	
 			this.setState({ checked: isChecked });
 	
-			this.props.update(this.state.title, isChecked);
+			// this.props.update(this.state.title, isChecked);
 		},
 	
 		delete: function _delete() {
 	
-			this.props.remover(this.state.title);
+			this.props.remover(this.state.id);
 		},
 		render: function render() {
 	
-			var title = this.state.title;
-	
 			return React.createElement(
-				"div",
+				'div',
 				null,
-				React.createElement("input", { type: "checkbox", checked: this.state.checked, onChange: this.toggleChecked }),
+				React.createElement('input', { type: 'checkbox', checked: this.state.checked, onChange: this.toggleChecked }),
 				React.createElement(
-					"label",
-					{ htmlFor: "Checkbox" },
+					'label',
+					{ htmlFor: 'Checkbox' },
 					this.state.title
 				),
 				React.createElement(
-					"button",
-					{ type: "button", style: { backgroundColor: "red" }, onClick: this.delete },
-					"X"
+					'button',
+					{ type: 'button', style: { backgroundColor: "red" }, onClick: this.delete },
+					'X'
 				)
 			);
 		}

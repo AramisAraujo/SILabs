@@ -1,14 +1,16 @@
 let React = require('react');
+let jQuery = require('jquery');
 
 let SubTask = React.createClass({
 
 	getInitialState: function() {
 
-		id = this.props.id;
-		checked = this.props.checked;
-		title = this.props.title;
+		let id = this.props.id;
+		let checked = this.getStatChecked(id);
+		let title = this.getStatTitle(id);
 
 		return({
+			id: id,
 			checked: checked,
 			title: title,
 
@@ -17,15 +19,16 @@ let SubTask = React.createClass({
 
     getStatChecked(id){
 
-	    const url = 'http://localhost:8080/getSTcheck?Id='+id;
-        checked =jQuery.ajax({ type: "GET", url: url, async: false});
+	    const url = 'http://localhost:8080/getSTChecked?id='+ id;
 
-        return checked;
+        let checked = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+        return JSON.parse(checked);
     },
 
     getStatTitle(id){
-      const url = 'http://localhost:8080/getSTtitle?id='+id;
-      title = jQuery.ajax({ type: "GET", url: url, async: false});
+      const url = 'http://localhost:8080/getSTTitle?id='+ id;
+      let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
       return title;
     },
@@ -34,16 +37,19 @@ let SubTask = React.createClass({
 
 		let isChecked = this.state.checked === true ? false : true;
 
+        let url = 'http://localhost:8080/changeSTChecked?id='+ this.state.id;
+
+        url = url + '&checked=' + isChecked;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
+
 		this.setState({checked: isChecked});
 
-		this.props.update(this.state.title, isChecked);
+		// this.props.update(this.state.title, isChecked);
 
 	},
 
 	delete: function(){
-        const url = 'http://localhost:8080/delST?id='+ this.state.id;
-
-        jQuery.ajax({ type: "GET", url: url, async: false});
 
 		this.props.remover(this.state.id);
 

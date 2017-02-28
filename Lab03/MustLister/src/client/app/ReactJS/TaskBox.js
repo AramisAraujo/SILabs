@@ -8,124 +8,101 @@ let TaskBox = React.createClass({
 	getInitialState: function(){
 
 		let now = Date.now().toString();
-		let listsData = this.fetchLists();
+		let listIds = this.getListsID();
 
 		return{
 
 		"lastUpdated":now,
-		"listsData":listsData,
+		"listIds":listIds,
 		};
 	},
 
 	updateData: function(){
 
-		let listsData = this.fetchLists();
-		let completion = this.getCompletion(listsData);
+		let listIds = this.getListsID();
+		let completion = this.getCompletion(listIds);
 
-		this.setState({listsData:listsData});
+		this.setState({listIds:listIds});
 		this.setState({completion:completion});
 
 	},
 
-	saveLists: function(){
+	// saveLists: function(){
+    //
+	//     //take a look
+    //
+	// 	let listIds = this.getListsID();
+    //
+	// 	listsIds.map(function (id){
+	// 		saveListId(id);
+	// 	});
+    //
+    //
+	// },
 
-		let listIds = this.getListsID;
+	getCompletion: function(listIds){
 
-		listsIds.map(function (id){
-			saveListId(id);
-		});
+	    let url = 'http://localhost:8080/getCompletionRate';
 
+		let completion = JSON.parse(jQuery.ajax({ type: "GET", url: url, async: false}).responseText);
 
-	},
-
-	getCompletion: function(listsData){
-
-		let completedTasks = 0.0;
-		let taskCount = 0.0;
-
-		listsData.map(function (listItem) {
-
-			if(listItem.data == []){
-				return 0;
-			}
-
-			listItem.data.map(function (taskItem){
-
-				if(taskItem.completed){
-
-					completedTasks += 1;
-				}
-				taskCount += 1;
-			});
-
-
-			});
-		let completionRate;
-
-		if(taskCount == 0){
-
-			completionRate = 0;
-		}
-		else{
-			completionRate =  (completedTasks / taskCount) * 100;
-
-		}
-
-		return Math.ceil(completionRate);
+		return Math.ceil(completion * 100);
 
 	},
 
-	saveListId: function(listID, newData){
+	// saveListId: function(listID, newData){
+    //
+	// 	this.updateData();
+    //
+	// 	let listsData = this.state.listsData;
+    //
+	// 	let listData = listsData.filter(function (listItem){
+    //
+	// 			if(listItem.id == listID){
+	// 				listItem.data = newData;
+	// 				return true;
+	// 			}
+	// 		});
+    //
+	// 	const url = "http://localhost:8080/saveList";
+    //
+	// 	listData = JSON.stringify(listData[0]);
+    //
+	// 	jQuery.ajax({ type: "POST", url: url, data:listData, contentType: "application/json"});
+    //
+	// 	this.updateData();
+    //
+	// },
 
-		this.updateData();
-
-		let listsData = this.state.listsData;
-
-		let listData = listsData.filter(function (listItem){
-
-				if(listItem.id == listID){
-					listItem.data = newData;
-					return true;
-				}
-			});
-
-		const url = "http://localhost:8080/saveList";
-
-		listData = JSON.stringify(listData[0]);
-
-		jQuery.ajax({ type: "POST", url: url, data:listData, contentType: "application/json"});		
-
-		this.updateData();
-
-	},
-
-	fetchLists: function(){
-
-		let listIds = this.getListsID();
-
-		let listsData = [];
-
-		listIds.map(function (listID){
-
-			let url = "http://localhost:8080/getTaskList?id=" + listID;
-
-			let listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
-
-			listData = JSON.parse(listData);
-
-			listsData.push(listData);
-
-		})
-
-		function compareID(a,b) {
-  			return parseInt(a.id) - parseInt(b.id);
-		}
-
-		listsData = listsData.sort(compareID);
-
-		return listsData;
-
-	},
+	// fetchLists: function(){
+	//
+	//     //get only the ids
+    //
+	// 	let listIds = this.getListsID();
+    //
+	// 	let listsData = [];
+    //
+	// 	listIds.map(function (listID){
+    //
+	// 		let url = "http://localhost:8080/getTaskList?id=" + listID;
+    //
+	// 		let listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+    //
+	// 		listData = JSON.parse(listData);
+    //
+	// 		listsData.push(listData);
+    //
+	// 	})
+    //
+	// 	function compareID(a,b) {
+  	// 		return parseInt(a.id) - parseInt(b.id);
+	// 	}
+    //
+	// 	listsData = listsData.sort(compareID);
+    //
+	// 	return listsData;
+    //
+	// },
 
 	getListsID: function(){
 
@@ -134,24 +111,25 @@ let TaskBox = React.createClass({
 		let listIds = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
 		return JSON.parse(listIds);
-
 	},
 
 	createNewList: function(){
 
 		let listTitle = prompt("Insert new TaskList Title","TaskList Title");
 
-		let id = this.generateID();
+		// let id = this.generateID();
 
-		let stuff = ({"id":id,"title":listTitle,"data":{}});
+		// let stuff = ({"id":id,"title":listTitle,"data":{}});
 
-		stuff = JSON.stringify(stuff);
+		// stuff = JSON.stringify(stuff);
 
-		const url = "http://localhost:8080/createNewList";
+		let  url = "http://localhost:8080/createNewList?title=";
 
-		jQuery.ajax({ type: "POST", url: url, data:stuff, contentType: "application/json"});
+		url = url + listTitle;
 
-		this.setState({lastUpdated:id});
+	    jQuery.ajax({ type: "GET", url: url, async:false});
+
+		// this.setState({lastUpdated:id});
 
 		this.updateData();
 
@@ -159,23 +137,19 @@ let TaskBox = React.createClass({
 
 	},
 
-	generateID: function () {
-
-		return Date.now().toString();
-	},
+	// generateID: function () {
+    //
+	// 	return Date.now().toString();
+	// },
 
 	renderTaskLists: function(){
 
-		let lists = this.fetchLists();
+		let lists = this.getListsID();
 
-		let renderedLists = lists.map(function (taskList){
+		let renderedLists = lists.map(function (taskListId){
 
-			let data = taskList.data;
-
-			return(<TaskList key={taskList.id} id={taskList.id}
-				taskData={data}
-				title={taskList.title} saveList={this.saveListId} completion={taskList.completion}
-				removeList={this.removeTaskList}/>);
+			return(<TaskList key={taskListId} id={taskListId}
+				removeList={this.removeTaskList} updateCompletion={this.updateData}/>);
 
 		}, this);
 
@@ -187,8 +161,7 @@ let TaskBox = React.createClass({
 
 		const url = "http://localhost:8080/deleteList?id=" + listId;
 
-		let listIds = jQuery.ajax({ type: "GET", url: url, async: false});
-
+		jQuery.ajax({ type: "GET", url: url, async: false});
 
 		this.updateData();
 	},
@@ -199,7 +172,7 @@ let TaskBox = React.createClass({
 		return(
 		<div>
 			<div className="myBox">
-				<h1>This is your MustLister [{this.getCompletion(this.state.listsData)}% Completed]</h1>
+				<h1>This is your MustLister [{this.getCompletion(this.state.listIds)}% Completed]</h1>
 				{this.renderTaskLists()}
 				<button type="button" style={{backgroundColor: "gold"}} onClick={this.createNewList}>+</button>
 			</div>

@@ -3,6 +3,7 @@ package com.example;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,12 +21,12 @@ public class TaskList implements Serializable{
 
 	@Id
 	@Column(name = "id")
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
 	private String title;
 	
-	@OneToMany(targetEntity=Task.class)
+	@OneToMany(cascade = CascadeType.ALL, targetEntity=Task.class)
 	private List<Task> tasks;
 
 	public TaskList(String title, List<Task> tasks) {

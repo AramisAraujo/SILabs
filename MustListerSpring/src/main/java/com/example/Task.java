@@ -1,48 +1,22 @@
 package com.example;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-@Entity
-public class Task implements Serializable{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5263039426747289247L;
-
-	@Id
-	@Column(name = "id")
-	@GeneratedValue(strategy=GenerationType.IDENTITY) 
-	private long id;
+public class Task {
 	
+	@SuppressWarnings("unused")
+	private final String id;
 	private String color;
 	private String title;
 	private String font;
 	private boolean completed;
-	
-	@ElementCollection
-	private List<String> tags;
-	
+	private String tags[];
 	private String priority;
 	private String description;
+	private Subtask subtasks[];
 	
-	@OneToMany(cascade = CascadeType.ALL, targetEntity=Subtask.class)
-	private List<Subtask> subtasks;
-	
-
-	public Task(String color, String title, String font, boolean completed, List<String> tags, String priority,
-			String description, List<Subtask> subtasks) {
+	public Task(String id, String color, String title, String font, boolean completed, String[] tags, String priority,
+			String description, Subtask subtasks[]) {
 		super();
+		this.id = id;
 		this.color = color;
 		this.title = title;
 		this.font = font;
@@ -51,18 +25,6 @@ public class Task implements Serializable{
 		this.priority = priority;
 		this.description = description;
 		this.subtasks = subtasks;
-	}
-	
-	protected Task(){
-		
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getColor() {
@@ -97,11 +59,11 @@ public class Task implements Serializable{
 		this.completed = completed;
 	}
 
-	public List<String> getTags() {
+	public String[] getTags() {
 		return tags;
 	}
 
-	public void setTags(List<String> tags) {
+	public void setTags(String[] tags) {
 		this.tags = tags;
 	}
 
@@ -121,15 +83,19 @@ public class Task implements Serializable{
 		this.description = description;
 	}
 
-	public List<Subtask> getSubtasks() {
+	public Subtask[] getSubtasks() {
 		return subtasks;
 	}
 
-	public void setSubtasks(List<Subtask> subtasks) {
+	public void setSubtasks(Subtask[] subtasks) {
 		this.subtasks = subtasks;
 	}
-
 	
-
+	
+	@Override
+	public String toString() {
+		return "hey";
+	}
+	
 
 }

@@ -3,11 +3,12 @@ import {CirclePicker} from 'react-color';
 let React = require('react');
 let FontPicker = require('react-font-picker');
 let SubTask = require('./SubTask.js');
+let jQuery = require('jquery');
 
 let Task = React.createClass({
 
 	getInitialState: function () {
-        let id = this.props.id;
+        let id = this.props.taskID;
 
         let tags = this.loadTags(id);
         let color = this.loadColor(id);
@@ -28,16 +29,16 @@ let Task = React.createClass({
 
 	    const url = 'http://localhost:8080/getTaskTags?id='+ id;
 
-        let tags = jQuery.ajax({ type: "GET", url: url, async: false});
+        let tags = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
-        return tags;
+        return JSON.parse(tags);
     },
 
     loadColor(id){
 
         const url = 'http://localhost:8080/getTaskColor?id='+ id;
 
-        let color = jQuery.ajax({ type: "GET", url: url, async: false});
+        let color = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return color;
     },
@@ -46,7 +47,7 @@ let Task = React.createClass({
 
         const url = 'http://localhost:8080/getTaskTitle?id='+ id;
 
-        let title = jQuery.ajax({ type: "GET", url: url, async: false});
+        let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return title;
     },
@@ -55,7 +56,7 @@ let Task = React.createClass({
 
         const url = 'http://localhost:8080/getTaskFont?id='+ id;
 
-        let font = jQuery.ajax({ type: "GET", url: url, async: false});
+        let font = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return font;
     },
@@ -63,23 +64,23 @@ let Task = React.createClass({
 
         const url = 'http://localhost:8080/getTaskSTList?id='+ id;
 
-        let subtasks = jQuery.ajax({ type: "GET", url: url, async: false});
+        let subtasks = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
-        return subtasks;
+        return JSON.parse(subtasks);
     },
     loadCompletion(id){
 
         const url = 'http://localhost:8080/getTaskCompletion?id='+ id;
 
-        let completion = jQuery.ajax({ type: "GET", url: url, async: false});
+        let completion = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
-        return completion;
+        return JSON.parse(completion);
     },
     loadDesc(id){
 
         const url = 'http://localhost:8080/getTaskDesc?id='+ id;
 
-        let desc = jQuery.ajax({ type: "GET", url: url, async: false});
+        let desc = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return desc;
     },
@@ -87,7 +88,7 @@ let Task = React.createClass({
 
         const url = 'http://localhost:8080/getTaskPrio?id='+ id;
 
-        let priority = jQuery.ajax({ type: "GET", url: url, async: false});
+        let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return priority;
     },
@@ -95,11 +96,7 @@ let Task = React.createClass({
 	removeTask: function(submitEvent) {
 
 		submitEvent.preventDefault();//Overrides default submit event
-		this.props.removeTask(this.state.id);
-
-        const url = 'http://localhost:8080/delTask?id='+ this.state.id;
-
-        jQuery.ajax({ type: "GET", url: url, async: false});
+		this.props.remover(this.state.id);
 
 	},
 
@@ -110,26 +107,33 @@ let Task = React.createClass({
 		let completed = this.state.completed ===
 				true ? false : true;
 
-		this.setState({completed: completed});
-		
-		this.props.updateCompletion(this.state.id, completed);
-
         let url = 'http://localhost:8080/changeTaskCompletion?id='+ this.state.id;
-        url = url +'&completion=' + completed;
 
+        url = url +'&completed=' + completed;
         jQuery.ajax({ type: "GET", url: url, async: false});
 
-	},
+        this.props.updateCompletion();
+        this.setState({completed: completed});
+    },
 
 	changeColor: function(newColor) {
 
 		this.setState({color: newColor.hex});
 
+        let url = 'http://localhost:8080/changeTaskColor?id='+ this.state.id;
+        url = url +'&color=' + newColor.hex;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
 	},
 
 	changeFont: function(newFont) {
 
-		this.setState({font: newFont})
+		this.setState({font: newFont});
+
+        let url = 'http://localhost:8080/changeTaskFont?id='+ this.state.id;
+        url = url +'&font=' + newFont;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
 
 	},
 
@@ -145,21 +149,14 @@ let Task = React.createClass({
 
 			this.setState({tags:tags});
 
-			this.props.updateTagTask(this.state.id, tags);
+			// this.props.updateTagTask(this.state.id, tags);
+
+            let url = 'http://localhost:8080/addTaskTag?id='+ this.state.id;
+            url = url +'&tag=' + tagTitle;
+
+            jQuery.ajax({ type: "GET", url: url, async: false});
 		}
 
-
-	},
-
-	removeTag: function(aTag){
-
-		let tagData = this.state.tags;
-
-		tagData = tagData.filter(function (tagElement) {
-			return tagElement !== aTag;
-		});
-
-		this.setState({tags: tagData});
 
 	},
 
@@ -173,12 +170,15 @@ let Task = React.createClass({
 
 			let color = this.getPriorityColor(newPriority);
 
+            let url = 'http://localhost:8080/changeTaskPrio?id='+ this.state.id;
+            url = url +'&prio=' + newPriority;
+
+            jQuery.ajax({ type: "GET", url: url, async: false});
+
 			this.setState({priority: newPriority, color:color});
-			this.props.changePrio(this.state.id, newPriority);
-			this.props.changeColor(this.state.id, color);
 		}
 
-		this.forceUpdate();		
+
 	},
 
 	togglePriority: function(){
@@ -211,7 +211,12 @@ let Task = React.createClass({
 
 			this.setState({description:description});
 			this.refs.description.value = description;
-			this.props.updateDesc(this.state.id, description);
+			// this.props.updateDesc(this.state.id, description);
+
+            let url = 'http://localhost:8080/changeTaskDesc?id='+ this.state.id;
+            url = url +'&desc=' + description;
+
+            jQuery.ajax({ type: "GET", url: url, async: false});
 		}
 
 	},
@@ -219,28 +224,33 @@ let Task = React.createClass({
 	addSubtask: function(){
 
 		let title = prompt("Insert new SubTask Title:","SubTask Title");
-		let checked = false;
 
-		let subtaskData = this.state.subtasks.concat([{title,checked}]);
 
-		this.setState({subtasks:subtaskData});
+        let url = 'http://localhost:8080/createST?title='+ title;
 
-		this.props.updateSTask(this.state.id, subtaskData);
+        url = url + '&taskId=' + this.state.id;
 
-		
+        let stId = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+		let subtasksIdList = this.state.subtasks;
+
+		subtasksIdList = subtasksIdList.concat(stId);
+
+		this.setState({subtasks: subtasksIdList});
 	},
 
-	removeSubtask: function(subtaskTitle){
+	removeSubtask: function(subtaskID){
 
-		let subtasks = this.state.subtasks.filter(function(subTask){
-			return subTask.title != subtaskTitle;
+		let subtasks = this.state.subtasks.filter(function(id){
+			return id != subtaskID;
 		});
 
-		this.setState({subtasks:subtasks});
+        const url = 'http://localhost:8080/delST?id='+ subtaskID;
 
-		this.props.updateSTask(this.state.id,subtasks);
-		
-	},
+        jQuery.ajax({ type: "GET", url: url, async: false});
+
+        this.setState({subtasks:subtasks});
+    },
 
 	renderSubtasks: function(){
 
@@ -248,34 +258,26 @@ let Task = React.createClass({
 			return;
 		}
 
-		let subtasksToRender = this.state.subtasks.map(function (staskItem){
-			let id = this.generateID();
+        let urlGetTitle = 'http://localhost:8080/getSTTitle?id=';
+        let urlGetChecked = 'http://localhost:8080/getSTChecked?id=';
 
-			return(<SubTask key={id} title={staskItem.title} 
-				checked={staskItem.checked} update={this.handleSubUpdate}
-				remover={this.removeSubtask}
-			/>);
+		let subtasksToRender = this.state.subtasks.map(function (subtaskID){
+
+		    let urlTitle = urlGetTitle+subtaskID;
+		    let urlChecked = urlGetChecked+subtaskID
+
+            let checked = jQuery.ajax({ type: "GET", url: urlChecked, async: false}).responseText;
+
+		    checked = JSON.parse(checked);
+
+		    let title = jQuery.ajax({ type: "GET", url: urlTitle, async: false}).responseText;
+
+
+			return(<SubTask key={subtaskID} id={subtaskID} remover={this.removeSubtask}/>);
+
 		}, this);
 
 		return subtasksToRender;
-	},
-
-	generateID: function () {
-
-		return Date.now().toString();
-	},
-
-	handleSubUpdate: function(title, checked){
-	
-	let subtasks = this.state.subtasks;
-
-	subtasks.map(function(subTask){
-			if(subTask.title == title){
-				subTask.checked = checked;
-			}
-		});
-
-		this.props.updateSTask(this.state.id,subtasks);
 	},
 
 	getPriorityColor: function(priority){
@@ -301,10 +303,13 @@ let Task = React.createClass({
 
 		});
 
-		this.setState({tags:tags});
+        let url = 'http://localhost:8080/delTaskTag?id='+ this.state.id;
 
-		this.props.updateTagTask(this.state.id, tags);
-	},
+        url = url +'&tag=' + tagToRemove.toLowerCase();
+        jQuery.ajax({ type: "GET", url: url, async: false});
+
+        this.setState({tags:tags});
+    },
 
 
 	render: function () {
@@ -313,7 +318,7 @@ let Task = React.createClass({
 
 		if(this.state.completed == true){
 
-			let style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};
+		    style = {color:this.state.color, fontFamily:this.state.font,backgroundColor: "gold"};
 
 		}
 
@@ -323,7 +328,7 @@ let Task = React.createClass({
 			<div className="myBoxTask" onDoubleClick={this.togglePriority}>
 
 				<h2 style={style}>
-					{this.props.title}
+					{this.state.title}
 				</h2>
 				{/*
 				<h1>

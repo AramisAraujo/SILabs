@@ -10,12 +10,13 @@ let TaskList = React.createClass({
         let title = this.loadTitle(id);
         let tasks = this.loadTasksList(id);
 
-		let completion = this.getCompletion();
+		let completion = this.getCompletion(tasks);
 
 		return{
 			id: id,
 			title:title,
 			completion: completion,
+			tasks: tasks,
 			filterTag: "",
 			filterPriority:""
 		};
@@ -25,9 +26,9 @@ let TaskList = React.createClass({
 
         const url = 'http://localhost:8080/getTLTasksID?id='+ id;
 
-        let tasksId = jQuery.ajax({ type: "GET", url: url, async: false});
+        let tasksId = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
-        return tasksId;
+        return JSON.parse(tasksId);
 
     },
 
@@ -35,7 +36,7 @@ let TaskList = React.createClass({
 
         const url = 'http://localhost:8080/getTLTitle?id='+ id;
 
-        let title = jQuery.ajax({ type: "GET", url: url, async: false});
+        let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
         return title;
 
@@ -43,74 +44,79 @@ let TaskList = React.createClass({
 
 	handleTaskSubmit: function (title) {
 
-		let data = this.state.data;
-		let id = this.generateID();
-		let tags = [];
-		let completed = false;
-		let description = "";
-		let priority = "low";
-		let color = "blue";
+        let url = 'http://localhost:8080/createTask?title='+ title;
 
-		if(data == []){
-			data = data.concat([{id,title,completed,tags,description,priority,color}]);
-		}
-		else{
+        url = url + '&listId=' + this.state.id;
 
-			data = data.concat([{id,title,completed,tags,description,priority,color}]);
-		}
+        let taskId = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
-		this.setState({data});
+        taskId = JSON.parse(taskId);
 
-		this.updateCompletion(data);
+        let tasks = this.state.tasks;
 
-		this.props.saveList(this.state.id, data);
+        tasks = tasks.concat(taskId);
+
+        this.updateCompletion(tasks);
+
+        this.setState({tasks: tasks});
 
 	},
 
 	handleTaskRemoval: function(taskID) {
 
-		let taskData = this.state.data;
+		let tasks = this.state.tasks;
 
-		taskData = taskData.filter(function (element) {
-			return element.id !== taskID;
+		tasks = tasks.filter(function (id) {
+			return id !== taskID;
 		});
 
-		this.setState({data: taskData});
 
-		this.updateCompletion(taskData);
+        let url = 'http://localhost:8080/removeTask?id='+ this.state.id;
 
-		this.props.saveList(this.state.id, taskData);
+        url = url + '&taskId='+taskID;
+
+        jQuery.ajax({ type: "GET", url: url, async: false});
+
+        this.updateCompletion();
+
+        this.props.updateCompletion();
+
+        this.setState({tasks: tasks});
 
 	},
 
-	generateID: function () {
 
-		return Date.now().toString();
-	},
+	updateCompletion: function(){
 
-	updateCompletion: function(taskData){
+	    let tasks = this.loadTasksList(this.state.id);
 
-		let completionRate = this.getCompletion(taskData);
+		let completionRate = this.getCompletion(tasks);
+
+		this.props.updateCompletion();
 
 		this.setState({completion: completionRate});
 
-		this.props.saveList(this.state.id, taskData);
-
 	},
 
-	getCompletion: function(taskData){
+	getCompletion: function(taskIdList){
 
 		let completedTasks = 0.0;
 		let taskCount = 0.0;
 
-		if(taskData = []){
+
+		if(taskIdList === []){
 			return 0;
 		}
 
+		taskIdList.map(function (taskId) {
 
-		taskData.map(function (taskItem) {
+            const url = 'http://localhost:8080/getTaskCompletion?id='+ taskId;
 
-			if(taskItem.completed){
+            let completed = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+            completed = JSON.parse(completed);
+
+			if(completed){
 
 				completedTasks += 1;
 			}
@@ -132,87 +138,87 @@ let TaskList = React.createClass({
 
 	},
 
-	handleTaskCompletion: function(taskID, taskIsCompleted) {
-
-		this.state.data.map(function (taskItem) {
-
-			if(taskItem.id == taskID){
-
-				taskItem.completed = taskIsCompleted;
-			}
-
-		}, this);
-
-		let newData = this.state.data;
-
-		this.updateCompletion(newData);
-
-	},
-
-	handleTaskDescUpdate: function(taskID, newDescription) {
-
-		let data = this.state.data;
-
-		data.map(function (taskItem) {
-
-			if(taskItem.id == taskID){
-
-				taskItem.description = newDescription;
-			}
-
-		}, this);
-
-		this.props.saveList(this.state.id, data);
-
-	},
-	handleTaskTagUpdate: function(taskID, newTags) {
-
-		let data = this.state.data;
-		data.map(function (taskItem) {
-
-			if(taskItem.id == taskID){
-
-				taskItem.tags = newTags;
-			}
-
-		}, this);
-
-		this.props.saveList(this.state.id, data);
-
-	},
-
-	handleTaskSubUpdate: function(taskID,subtaskData){
-
-		let data = this.state.data;
-
-		data.map(function (taskItem) {
-
-			if(taskItem.id == taskID){
-				taskItem.subtasks = subtaskData;
-			}
-
-		}, this);
-
-		this.props.saveList(this.state.id, data);
-
-	},
-
-	handleTaskPrioUpdate: function(taskID,newPriority){
-
-		let data = this.state.data;
-
-		data.map(function (taskItem) {
-
-		if(taskItem.id == taskID){
-
-			taskItem.priority = newPriority;
-			}
-
-		}, this);
-
-		this.props.saveList(this.state.id, data);
-
-	},
+	// handleTaskCompletion: function(taskID, taskIsCompleted) {
+    //
+	// 	this.state.data.map(function (taskItem) {
+    //
+	// 		if(taskItem.id == taskID){
+    //
+	// 			taskItem.completed = taskIsCompleted;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	let newData = this.state.data;
+    //
+	// 	this.updateCompletion(newData);
+    //
+	// },
+    //
+	// handleTaskDescUpdate: function(taskID, newDescription) {
+    //
+	// 	let data = this.state.data;
+    //
+	// 	data.map(function (taskItem) {
+    //
+	// 		if(taskItem.id == taskID){
+    //
+	// 			taskItem.description = newDescription;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	this.props.saveList(this.state.id, data);
+    //
+	// },
+	// handleTaskTagUpdate: function(taskID, newTags) {
+    //
+	// 	let data = this.state.data;
+	// 	data.map(function (taskItem) {
+    //
+	// 		if(taskItem.id == taskID){
+    //
+	// 			taskItem.tags = newTags;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	this.props.saveList(this.state.id, data);
+    //
+	// },
+    //
+	// handleTaskSubUpdate: function(taskID,subtaskData){
+    //
+	// 	let data = this.state.data;
+    //
+	// 	data.map(function (taskItem) {
+    //
+	// 		if(taskItem.id == taskID){
+	// 			taskItem.subtasks = subtaskData;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	this.props.saveList(this.state.id, data);
+    //
+	// },
+    //
+	// handleTaskPrioUpdate: function(taskID,newPriority){
+    //
+	// 	let data = this.state.data;
+    //
+	// 	data.map(function (taskItem) {
+    //
+	// 	if(taskItem.id == taskID){
+    //
+	// 		taskItem.priority = newPriority;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	this.props.saveList(this.state.id, data);
+    //
+	// },
 
 
 	sortTaskPriority: function() {
@@ -221,17 +227,21 @@ let TaskList = React.createClass({
 
 		sortedTasks = sortedTasks.concat(this.getMedPriorityTasks(), this.getLowPriorityTasks());
 
-		this.setState({data: sortedTasks});
+		this.setState({tasks: sortedTasks});
 
-		return;
 	},
 
 	getLowPriorityTasks: function() {
 
-		let taskData = this.state.data;
+		let tasksList = this.state.tasks;
 
-		let lowTasks = taskData.filter(function (taskItem) {
-			return taskItem.priority == "low";
+		let lowTasks = tasksList.filter(function (taskId) {
+
+            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+
+            let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+			return priority == "low";
 		});
 
 		return lowTasks;
@@ -240,43 +250,75 @@ let TaskList = React.createClass({
 
 	getMedPriorityTasks: function(){
 
-		let taskData = this.state.data;
+        let tasksList = this.state.tasks;
 
-		let medTasks = taskData.filter(function (taskItem) {
-			return taskItem.priority == "medium";
-		});
+        let medTasks = tasksList.filter(function (taskId) {
 
-		return medTasks;
+            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+
+            let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+            return priority == "medium";
+        });
+
+        return medTasks;
 
 	},
 
 	getHighPriorityTasks: function(){
 
-		let taskData = this.state.data;
+        let tasksList = this.state.tasks;
 
-		let highTasks = taskData.filter(function (taskItem) {
-			return taskItem.priority == "high";
-		});
+        let highTasks = tasksList.filter(function (taskId) {
 
-		return highTasks;
+            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+
+            let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+            return priority == "high";
+        });
+
+        return highTasks;
 
 	},
 
 	sortTaskTitle: function() {
 
 		function compareTitle(a,b) {
-  			if (a.title.toLowerCase() < b.title.toLowerCase())
+  			if (a[1].toLowerCase() < b[1].toLowerCase())
     			return -1;
-  			if (a.title.toLowerCase() > b.title.toLowerCase())
+  			if (a[1].toLowerCase() > b[1].toLowerCase())
    				return 1;
  			return 0;
 		}
 
-		let sortedTasks = this.state.data.sort(compareTitle);
+		let taskIds = this.state.tasks;
 
-		this.setState({data:sortedTasks});
+		let tasksTitleAndId = [];
 
-		return;
+		taskIds.map(function (id) {
+            const url = 'http://localhost:8080/getTaskTitle?id='+ id;
+
+            let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+            tasksTitleAndId = tasksTitleAndId.concat([[id,title]]);
+
+        });
+
+
+		let sortTasks = tasksTitleAndId.sort(compareTitle);
+
+		let sorted = [];
+
+		sortTasks.map(function (item) {
+
+		    sorted = sorted.concat(item[0]);
+
+        });
+
+
+		this.setState({tasks:sorted});
+
 
 	},
 
@@ -286,8 +328,6 @@ let TaskList = React.createClass({
 
 		priority = priority.toLowerCase().trim();
 
-		let filteredTasks;
-
 		if(priorities.includes(priority)){
 
 			this.setState({filterPriority: priority});
@@ -295,8 +335,6 @@ let TaskList = React.createClass({
 		else if (priority == "" && this.state.filterPriority != ""){
 			this.setState({filterPriority:""});
 		}
-
-		return;
 
 	},
 
@@ -315,8 +353,6 @@ let TaskList = React.createClass({
 
 		this.setState({filterTag: tag});
 
-		return;
-
 	},
 
 	setTitle: function(newTitle) {
@@ -324,76 +360,73 @@ let TaskList = React.createClass({
 		newTitle = newTitle.trim();
 
 		if(newTitle != ""){
-			this.setState({title:newTitle});
-		}
+            let url = 'http://localhost:8080/changeTLTitle?id='+ id;
 
-		this.props.saveList(this.state.id, this.state.data);
+            url = url + '&title=' + newTitle;
+            jQuery.ajax({ type: "GET", url: url, async: false});
 
-	},
-
-	handleColorChange: function(taskID, newColor){
-
-		let data = this.state.data;
-
-		data.map(function (taskItem) {
-
-		if(taskItem.id == taskID){
-
-			taskItem.color = newColor;
-			}
-
-		}, this);
-
-		this.props.saveList(this.state.id, data);
+            this.setState({title:newTitle});
+        }
 
 	},
 
-	renderTasks: function(taskData){
+	// handleColorChange: function(taskID, newColor){
+    //
+	// 	let data = this.state.data;
+    //
+	// 	data.map(function (taskItem) {
+    //
+	// 	if(taskItem.id == taskID){
+    //
+	// 		taskItem.color = newColor;
+	// 		}
+    //
+	// 	}, this);
+    //
+	// 	this.props.saveList(this.state.id, data);
+    //
+	// },
+
+	renderTasks: function(taskIdList){
 
 		let prio = this.state.filterPriority;
 		let tagFilter = this.state.filterTag;
 
 		if(prio != ""){
-			taskData = taskData.filter(function (taskItem){
-				return taskItem.priority == prio;
+			taskIdList = taskIdList.filter(function (taskId){
+
+                const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+
+                let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+				return priority == prio;
 			});
 		}
 
 		if(tagFilter != ""){
-			taskData = taskData.filter(function (taskItem){
-				let tags = taskItem.tags;
+			taskIdList = taskIdList.filter(function (taskId){
+
+                const url = 'http://localhost:8080/getTaskTags?id='+ taskId;
+
+                let tags = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
 				return tags.includes(tagFilter);
 			});
 		}
 
-		if(taskData == ""){
 
-			taskData = [];
-		}
-
-		let listTasks = taskData.map(function (taskItem){
+		let taskListing = taskIdList.map(function (taskId){
 
 			return(
-				<li key={taskItem.id}>
-					<Task key={taskItem.id} taskID={taskItem.id} title={taskItem.title}
-					completed={taskItem.completed} tags={taskItem.tags} removeTask={this.handleTaskRemoval}
-					font={this.props.font} updateCompletion = {this.handleTaskCompletion}
-					description={taskItem.description}
-					priority={taskItem.priority}
-					subtasks={taskItem.subtasks}
-					updateDesc={this.handleTaskDescUpdate}
-					updateSTask={this.handleTaskSubUpdate}
-					changePrio={this.handleTaskPrioUpdate}
-					color={taskItem.color}
-					changeColor={this.handleColorChange}
-					updateTagTask={this.handleTaskTagUpdate}
-					/>
+				<li key ={taskId}>
+					<Task key={taskId} taskID={taskId} remover={this.handleTaskRemoval}
+                    updateCompletion={this.updateCompletion}/>
 				</li>
 
 			);
 		}, this);
 
-		return listTasks;
+		return taskListing;
 
 	},
 
@@ -405,9 +438,9 @@ let TaskList = React.createClass({
 	render: function () {
 
 		let tasks;
-		if(this.state.data != []){
+		if(this.state.tasks.length > 0){
 
-			tasks = this.renderTasks(this.state.data);
+			tasks = this.renderTasks(this.state.tasks);
 
 		}
 
