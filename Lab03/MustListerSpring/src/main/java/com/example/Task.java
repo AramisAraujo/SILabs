@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Task implements Serializable{
 
+
 	/**
 	 * 
 	 */
@@ -128,8 +129,5 @@ public class Task implements Serializable{
 	public void setSubtasks(List<Subtask> subtasks) {
 		this.subtasks = subtasks;
 	}
-
-	
-
 
 }

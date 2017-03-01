@@ -63,10 +63,4 @@ public class TaskList implements Serializable{
 		this.tasks = tasks;
 	}
 	
-	@Override
-	public String toString() {
-		
-		return String.format("%s,%s", this.id, this.tasks);
-	}
-
 }
