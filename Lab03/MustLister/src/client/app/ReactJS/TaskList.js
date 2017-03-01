@@ -1,6 +1,9 @@
 let React = require('react');
 let Task = require('./Task.js');
 let jQuery = require('jquery');
+let fileDownload = require('react-file-download');
+
+const host = 'https://mustlisterspring.herokuapp.com';
 
 let TaskList = React.createClass({
 
@@ -22,9 +25,23 @@ let TaskList = React.createClass({
 		};
 	},
 
+	downloadList: function(){
+
+		let url = host + '/getListToDownload';
+
+		url = url + '?id=' + this.state.id;
+
+		let data = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+		let filename = this.state.title + '.csv';
+
+		return (fileDownload(data, filename));
+
+	},
+
     loadTasksList: function (id) {
 
-        const url = 'http://localhost:8080/getTLTasksID?id='+ id;
+        const url = host + '/getTLTasksID?id='+ id;
 
         let tasksId = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -34,7 +51,7 @@ let TaskList = React.createClass({
 
     loadTitle: function (id) {
 
-        const url = 'http://localhost:8080/getTLTitle?id='+ id;
+        const url = host + '/getTLTitle?id='+ id;
 
         let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -44,7 +61,7 @@ let TaskList = React.createClass({
 
 	handleTaskSubmit: function (title) {
 
-        let url = 'http://localhost:8080/createTask?title='+ title;
+        let url = host + '/createTask?title='+ title;
 
         url = url + '&listId=' + this.state.id;
 
@@ -71,7 +88,7 @@ let TaskList = React.createClass({
 		});
 
 
-        let url = 'http://localhost:8080/removeTask?id='+ this.state.id;
+        let url = host + '/removeTask?id='+ this.state.id;
 
         url = url + '&taskId='+taskID;
 
@@ -110,7 +127,7 @@ let TaskList = React.createClass({
 
 		taskIdList.map(function (taskId) {
 
-            const url = 'http://localhost:8080/getTaskCompletion?id='+ taskId;
+            const url = host + '/getTaskCompletion?id='+ taskId;
 
             let completed = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -138,89 +155,6 @@ let TaskList = React.createClass({
 
 	},
 
-	// handleTaskCompletion: function(taskID, taskIsCompleted) {
-    //
-	// 	this.state.data.map(function (taskItem) {
-    //
-	// 		if(taskItem.id == taskID){
-    //
-	// 			taskItem.completed = taskIsCompleted;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	let newData = this.state.data;
-    //
-	// 	this.updateCompletion(newData);
-    //
-	// },
-    //
-	// handleTaskDescUpdate: function(taskID, newDescription) {
-    //
-	// 	let data = this.state.data;
-    //
-	// 	data.map(function (taskItem) {
-    //
-	// 		if(taskItem.id == taskID){
-    //
-	// 			taskItem.description = newDescription;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	this.props.saveList(this.state.id, data);
-    //
-	// },
-	// handleTaskTagUpdate: function(taskID, newTags) {
-    //
-	// 	let data = this.state.data;
-	// 	data.map(function (taskItem) {
-    //
-	// 		if(taskItem.id == taskID){
-    //
-	// 			taskItem.tags = newTags;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	this.props.saveList(this.state.id, data);
-    //
-	// },
-    //
-	// handleTaskSubUpdate: function(taskID,subtaskData){
-    //
-	// 	let data = this.state.data;
-    //
-	// 	data.map(function (taskItem) {
-    //
-	// 		if(taskItem.id == taskID){
-	// 			taskItem.subtasks = subtaskData;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	this.props.saveList(this.state.id, data);
-    //
-	// },
-    //
-	// handleTaskPrioUpdate: function(taskID,newPriority){
-    //
-	// 	let data = this.state.data;
-    //
-	// 	data.map(function (taskItem) {
-    //
-	// 	if(taskItem.id == taskID){
-    //
-	// 		taskItem.priority = newPriority;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	this.props.saveList(this.state.id, data);
-    //
-	// },
-
-
 	sortTaskPriority: function() {
 
 		let sortedTasks = this.getHighPriorityTasks();
@@ -237,7 +171,7 @@ let TaskList = React.createClass({
 
 		let lowTasks = tasksList.filter(function (taskId) {
 
-            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+            const url = host + '/getTaskPrio?id='+ taskId;
 
             let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -254,7 +188,7 @@ let TaskList = React.createClass({
 
         let medTasks = tasksList.filter(function (taskId) {
 
-            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+            const url = host + '/getTaskPrio?id='+ taskId;
 
             let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -271,7 +205,7 @@ let TaskList = React.createClass({
 
         let highTasks = tasksList.filter(function (taskId) {
 
-            const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+            const url = host + '/getTaskPrio?id='+ taskId;
 
             let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -297,7 +231,7 @@ let TaskList = React.createClass({
 		let tasksTitleAndId = [];
 
 		taskIds.map(function (id) {
-            const url = 'http://localhost:8080/getTaskTitle?id='+ id;
+            const url = host + '/getTaskTitle?id='+ id;
 
             let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -360,7 +294,7 @@ let TaskList = React.createClass({
 		newTitle = newTitle.trim();
 
 		if(newTitle != ""){
-            let url = 'http://localhost:8080/changeTLTitle?id='+ id;
+            let url = host + '/changeTLTitle?id='+ id;
 
             url = url + '&title=' + newTitle;
             jQuery.ajax({ type: "GET", url: url, async: false});
@@ -370,23 +304,6 @@ let TaskList = React.createClass({
 
 	},
 
-	// handleColorChange: function(taskID, newColor){
-    //
-	// 	let data = this.state.data;
-    //
-	// 	data.map(function (taskItem) {
-    //
-	// 	if(taskItem.id == taskID){
-    //
-	// 		taskItem.color = newColor;
-	// 		}
-    //
-	// 	}, this);
-    //
-	// 	this.props.saveList(this.state.id, data);
-    //
-	// },
-
 	renderTasks: function(taskIdList){
 
 		let prio = this.state.filterPriority;
@@ -395,7 +312,7 @@ let TaskList = React.createClass({
 		if(prio != ""){
 			taskIdList = taskIdList.filter(function (taskId){
 
-                const url = 'http://localhost:8080/getTaskPrio?id='+ taskId;
+                const url = host + '/getTaskPrio?id='+ taskId;
 
                 let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -406,9 +323,11 @@ let TaskList = React.createClass({
 		if(tagFilter != ""){
 			taskIdList = taskIdList.filter(function (taskId){
 
-                const url = 'http://localhost:8080/getTaskTags?id='+ taskId;
+                const url = host + '/getTaskTags?id='+ taskId;
 
                 let tags = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
+
+                tags = JSON.parse(tags);
 
 				return tags.includes(tagFilter);
 			});
@@ -465,6 +384,7 @@ let TaskList = React.createClass({
 
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByPriority.bind(this,"")}>Reset Priority Filter</button>
 				<button type="button" style={{backgroundColor: "turquoise"}} onClick={this.filterByTag.bind(this,true)}>Reset Tag Filter</button>
+				<button type="button" style={{backgroundColor: "aqua"}} onClick={this.downloadList}>Download This List</button>
 				<a type="button"className="close-ribbon" onClick={this.removeList}>&times;</a>
 			</ul>
 			);

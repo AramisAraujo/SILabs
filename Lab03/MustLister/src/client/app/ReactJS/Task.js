@@ -1,9 +1,10 @@
-import {CirclePicker} from 'react-color';
 
 let React = require('react');
 let FontPicker = require('react-font-picker');
 let SubTask = require('./SubTask.js');
 let jQuery = require('jquery');
+
+const host = 'https://mustlisterspring.herokuapp.com';
 
 let Task = React.createClass({
 
@@ -27,7 +28,7 @@ let Task = React.createClass({
 
     loadTags(id){
 
-	    const url = 'http://localhost:8080/getTaskTags?id='+ id;
+	    const url = host + '/getTaskTags?id='+ id;
 
         let tags = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -36,7 +37,7 @@ let Task = React.createClass({
 
     loadColor(id){
 
-        const url = 'http://localhost:8080/getTaskColor?id='+ id;
+        const url = host + '/getTaskColor?id='+ id;
 
         let color = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -45,7 +46,7 @@ let Task = React.createClass({
 
     loadTitle(id){
 
-        const url = 'http://localhost:8080/getTaskTitle?id='+ id;
+        const url = host + '/getTaskTitle?id='+ id;
 
         let title = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -54,7 +55,7 @@ let Task = React.createClass({
 
     loadFont(id){
 
-        const url = 'http://localhost:8080/getTaskFont?id='+ id;
+        const url = host + '/getTaskFont?id='+ id;
 
         let font = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -62,7 +63,7 @@ let Task = React.createClass({
     },
     loadSubtaskList(id){
 
-        const url = 'http://localhost:8080/getTaskSTList?id='+ id;
+        const url = host + '/getTaskSTList?id='+ id;
 
         let subtasks = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -70,7 +71,7 @@ let Task = React.createClass({
     },
     loadCompletion(id){
 
-        const url = 'http://localhost:8080/getTaskCompletion?id='+ id;
+        const url = host + '/getTaskCompletion?id='+ id;
 
         let completion = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -78,7 +79,7 @@ let Task = React.createClass({
     },
     loadDesc(id){
 
-        const url = 'http://localhost:8080/getTaskDesc?id='+ id;
+        const url = host + '/getTaskDesc?id='+ id;
 
         let desc = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -86,7 +87,7 @@ let Task = React.createClass({
     },
     loadPriority(id){
 
-        const url = 'http://localhost:8080/getTaskPrio?id='+ id;
+        const url = host + '/getTaskPrio?id='+ id;
 
         let priority = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -107,7 +108,7 @@ let Task = React.createClass({
 		let completed = this.state.completed ===
 				true ? false : true;
 
-        let url = 'http://localhost:8080/changeTaskCompletion?id='+ this.state.id;
+        let url = host + '/changeTaskCompletion?id='+ this.state.id;
 
         url = url +'&completed=' + completed;
         jQuery.ajax({ type: "GET", url: url, async: false});
@@ -120,7 +121,7 @@ let Task = React.createClass({
 
 		this.setState({color: newColor.hex});
 
-        let url = 'http://localhost:8080/changeTaskColor?id='+ this.state.id;
+        let url = host + '/changeTaskColor?id='+ this.state.id;
         url = url +'&color=' + newColor.hex;
 
         jQuery.ajax({ type: "GET", url: url, async: false});
@@ -130,7 +131,7 @@ let Task = React.createClass({
 
 		this.setState({font: newFont});
 
-        let url = 'http://localhost:8080/changeTaskFont?id='+ this.state.id;
+        let url = host + '/changeTaskFont?id='+ this.state.id;
         url = url +'&font=' + newFont;
 
         jQuery.ajax({ type: "GET", url: url, async: false});
@@ -149,9 +150,7 @@ let Task = React.createClass({
 
 			this.setState({tags:tags});
 
-			// this.props.updateTagTask(this.state.id, tags);
-
-            let url = 'http://localhost:8080/addTaskTag?id='+ this.state.id;
+            let url = host + '/addTaskTag?id='+ this.state.id;
             url = url +'&tag=' + tagTitle;
 
             jQuery.ajax({ type: "GET", url: url, async: false});
@@ -170,7 +169,7 @@ let Task = React.createClass({
 
 			let color = this.getPriorityColor(newPriority);
 
-            let url = 'http://localhost:8080/changeTaskPrio?id='+ this.state.id;
+            let url = host + '/changeTaskPrio?id='+ this.state.id;
             url = url +'&prio=' + newPriority;
 
             jQuery.ajax({ type: "GET", url: url, async: false});
@@ -211,9 +210,8 @@ let Task = React.createClass({
 
 			this.setState({description:description});
 			this.refs.description.value = description;
-			// this.props.updateDesc(this.state.id, description);
 
-            let url = 'http://localhost:8080/changeTaskDesc?id='+ this.state.id;
+            let url = host + '/changeTaskDesc?id='+ this.state.id;
             url = url +'&desc=' + description;
 
             jQuery.ajax({ type: "GET", url: url, async: false});
@@ -226,7 +224,7 @@ let Task = React.createClass({
 		let title = prompt("Insert new SubTask Title:","SubTask Title");
 
 
-        let url = 'http://localhost:8080/createST?title='+ title;
+        let url = host + '/createST?title='+ title;
 
         url = url + '&taskId=' + this.state.id;
 
@@ -245,7 +243,7 @@ let Task = React.createClass({
 			return id != subtaskID;
 		});
 
-        const url = 'http://localhost:8080/delST?id='+ subtaskID;
+        const url = host + '/delST?id='+ subtaskID;
 
         jQuery.ajax({ type: "GET", url: url, async: false});
 
@@ -258,8 +256,8 @@ let Task = React.createClass({
 			return;
 		}
 
-        let urlGetTitle = 'http://localhost:8080/getSTTitle?id=';
-        let urlGetChecked = 'http://localhost:8080/getSTChecked?id=';
+        let urlGetTitle = host + '/getSTTitle?id=';
+        let urlGetChecked = host + '/getSTChecked?id=';
 
 		let subtasksToRender = this.state.subtasks.map(function (subtaskID){
 
@@ -299,13 +297,13 @@ let Task = React.createClass({
 
 		tags = tags.filter(function (tagTitle){
 
-			return tagTitle != tagToRemove.toLowerCase();
+			return tagTitle.toLowerCase() != tagToRemove.toLowerCase();
 
 		});
 
-        let url = 'http://localhost:8080/delTaskTag?id='+ this.state.id;
+        let url = host + '/delTaskTag?id='+ this.state.id;
 
-        url = url +'&tag=' + tagToRemove.toLowerCase();
+        url = url +'&tag=' + tagToRemove;
         jQuery.ajax({ type: "GET", url: url, async: false});
 
         this.setState({tags:tags});

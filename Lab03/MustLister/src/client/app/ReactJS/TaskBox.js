@@ -3,6 +3,8 @@ let React = require('react');
 let TaskList = require('./TaskList.js');
 let jQuery = require('jquery');
 
+const host = 'https://mustlisterspring.herokuapp.com';
+
 let TaskBox = React.createClass({
 
 	getInitialState: function(){
@@ -27,22 +29,9 @@ let TaskBox = React.createClass({
 
 	},
 
-	// saveLists: function(){
-    //
-	//     //take a look
-    //
-	// 	let listIds = this.getListsID();
-    //
-	// 	listsIds.map(function (id){
-	// 		saveListId(id);
-	// 	});
-    //
-    //
-	// },
-
 	getCompletion: function(listIds){
 
-	    let url = 'http://localhost:8080/getCompletionRate';
+	    let url = host + '/getCompletionRate';
 
 		let completion = JSON.parse(jQuery.ajax({ type: "GET", url: url, async: false}).responseText);
 
@@ -50,63 +39,9 @@ let TaskBox = React.createClass({
 
 	},
 
-	// saveListId: function(listID, newData){
-    //
-	// 	this.updateData();
-    //
-	// 	let listsData = this.state.listsData;
-    //
-	// 	let listData = listsData.filter(function (listItem){
-    //
-	// 			if(listItem.id == listID){
-	// 				listItem.data = newData;
-	// 				return true;
-	// 			}
-	// 		});
-    //
-	// 	const url = "http://localhost:8080/saveList";
-    //
-	// 	listData = JSON.stringify(listData[0]);
-    //
-	// 	jQuery.ajax({ type: "POST", url: url, data:listData, contentType: "application/json"});
-    //
-	// 	this.updateData();
-    //
-	// },
-
-	// fetchLists: function(){
-	//
-	//     //get only the ids
-    //
-	// 	let listIds = this.getListsID();
-    //
-	// 	let listsData = [];
-    //
-	// 	listIds.map(function (listID){
-    //
-	// 		let url = "http://localhost:8080/getTaskList?id=" + listID;
-    //
-	// 		let listData = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
-    //
-	// 		listData = JSON.parse(listData);
-    //
-	// 		listsData.push(listData);
-    //
-	// 	})
-    //
-	// 	function compareID(a,b) {
-  	// 		return parseInt(a.id) - parseInt(b.id);
-	// 	}
-    //
-	// 	listsData = listsData.sort(compareID);
-    //
-	// 	return listsData;
-    //
-	// },
-
 	getListsID: function(){
 
-		const url = "http://localhost:8080/getListsID";
+		const url = host + '/getListsID';
 
 		let listIds = jQuery.ajax({ type: "GET", url: url, async: false}).responseText;
 
@@ -117,30 +52,17 @@ let TaskBox = React.createClass({
 
 		let listTitle = prompt("Insert new TaskList Title","TaskList Title");
 
-		// let id = this.generateID();
-
-		// let stuff = ({"id":id,"title":listTitle,"data":{}});
-
-		// stuff = JSON.stringify(stuff);
-
-		let  url = "http://localhost:8080/createNewList?title=";
+		let  url = host + '/createNewList?title=';
 
 		url = url + listTitle;
 
 	    jQuery.ajax({ type: "GET", url: url, async:false});
-
-		// this.setState({lastUpdated:id});
 
 		this.updateData();
 
 		this.forceUpdate();
 
 	},
-
-	// generateID: function () {
-    //
-	// 	return Date.now().toString();
-	// },
 
 	renderTaskLists: function(){
 
@@ -159,7 +81,7 @@ let TaskBox = React.createClass({
 
 	removeTaskList: function(listId){
 
-		const url = "http://localhost:8080/deleteList?id=" + listId;
+		const url = host + '/deleteList?id=' + listId;
 
 		jQuery.ajax({ type: "GET", url: url, async: false});
 
