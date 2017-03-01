@@ -1,7 +1,7 @@
 {
-  "name": "MustLister",
+  "name": "mustlister",
   "version": "1.1.0",
-  "description": "",
+  "description": "An app for a list of tasks",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
